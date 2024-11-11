@@ -1,0 +1,9 @@
+{
+  "development": {
+    "username": "postgres",
+    "password": "postgres",
+    "database": "brain-agriculture",
+    "host": "127.0.0.1",
+    "dialect": "postgres"
+  }
+}

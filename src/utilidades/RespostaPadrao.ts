@@ -18,7 +18,6 @@ export class RespostaPadrao {
       return;
     }
 
-    console.log(arguments);
     if (typeof data === "boolean" && arguments[1] != null && arguments[2] ) {
       this.Sucesso = arguments[0];
       this.Mensagem = arguments[2];

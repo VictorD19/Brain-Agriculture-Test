@@ -1,46 +1,64 @@
 import { MakeNullishOptional } from "sequelize/types/utils";
 import { IRepositorioBase } from "./IRepositorioBase";
-import { Model, ModelStatic, Op, WhereOptions } from "sequelize";
+import { Model, ModelStatic, Op, Transaction, WhereOptions } from "sequelize";
 
 export class RepositorioBase<T extends Model> implements IRepositorioBase<T> {
-  private _modelo: ModelStatic<T>;
+  //#region  Atributos
+  protected _modelo: ModelStatic<T>;
+  //#endregion
 
+  //#region Construtores
   constructor(modelo: ModelStatic<T>) {
     this._modelo = modelo;
   }
-  Inserir(item: T): Promise<T> {
-    return this._modelo.create(
-      item as MakeNullishOptional<T["_creationAttributes"]>
+  //#endregion
+
+  //#region  Metodos Publicos
+  async Inserir(item: Partial<T>, transaction?: Transaction): Promise<T> {
+    let itemCriacao = await this._modelo.create(
+      item as MakeNullishOptional<T["_creationAttributes"]>,
+      { transaction }
     );
+    await itemCriacao.save();
+    return itemCriacao;
   }
-  BuscarPorCodigo(codigo: number): Promise<T | null> {
-    return this._modelo.findByPk(codigo);
+  async BuscarPorCodigo(codigo: number): Promise<T | null> {
+    return await this._modelo.findByPk(codigo);
   }
-  BuscarPorCodigos(codigos: number[]): Promise<T[]> {
+  async BuscarPorCodigos(codigos: number[]): Promise<T[]> {
     const where: WhereOptions = {
-      ["id"]: {
+      ["Id"]: {
         [Op.in]: codigos,
       },
     };
-    return this._modelo.findAll({ where });
+    return await this._modelo.findAll({ where });
   }
-  BuscarTodos(): Promise<T[]> {
-    return this._modelo.findAll();
+  async BuscarTodos(): Promise<T[]> {
+    return await this._modelo.findAll();
   }
-  Deletar(id: number): Promise<number | null> {
-    const where: WhereOptions = { id };
-    return this._modelo.destroy({ where });
+  async Deletar(Id: number, transaction?: Transaction): Promise<number | null> {
+    const where: WhereOptions = { Id };
+    return await this._modelo.destroy({ where, transaction: transaction });
   }
-  Atualizar(id: number, item: Partial<T>): Promise<[number, T[]]> {
+  async Atualizar(
+    id: number,
+    item: Partial<T>,
+    transacao?: Transaction
+  ): Promise<[number, T[]]> {
     const where: WhereOptions = {
-      id,
+      Id: id,
     };
-    return this._modelo.update(item, { where, returning: true });
+    return await this._modelo.update(item, {
+      where,
+      returning: true,
+      transaction: transacao,
+    });
   }
-  ContarTodos(): Promise<number> {
-    return this._modelo.count();
+  async ContarTodos(): Promise<number> {
+    return await this._modelo.count();
   }
-  BuscarPrimerRegistro(): Promise<T | null> {
-    return this._modelo.findOne();
+  async BuscarPrimerRegistro(): Promise<T | null> {
+    return await this._modelo.findOne();
   }
+  //#endregion
 }

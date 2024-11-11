@@ -1,6 +1,5 @@
 import { Model, Optional, DataTypes } from "sequelize";
-import { FazendaModel } from "./FazendaModel";
-import { sequelize } from "../config/sequelize";
+import { sequelize } from "@configuracoes/sequelize";
 
 interface IProdutorAtributos {
   Id: number;
@@ -8,13 +7,9 @@ interface IProdutorAtributos {
   CpfCnpj: string;
 }
 
-interface IProdutorAtributosCriacao
-  extends Optional<IProdutorAtributos, "Id"> {}
+export interface IProdutorAtributosCriacao extends Optional<IProdutorAtributos, "Id"> {}
 
-class ProdutorModel
-  extends Model<IProdutorAtributos, IProdutorAtributosCriacao>
-  implements IProdutorAtributos
-{
+class ProdutorModel extends Model<IProdutorAtributos, IProdutorAtributosCriacao> implements IProdutorAtributos {
   public Id!: number;
   public Nome!: string;
   public CpfCnpj!: string;
@@ -22,6 +17,7 @@ class ProdutorModel
   public readonly DataCriacao!: Date;
   public readonly DataUltimaAtualizacao!: Date;
 }
+
 ProdutorModel.init(
   {
     Id: {
@@ -32,6 +28,7 @@ ProdutorModel.init(
     CpfCnpj: {
       type: DataTypes.STRING,
       allowNull: false,
+      unique: true,
     },
     Nome: {
       type: DataTypes.STRING,
@@ -44,10 +41,5 @@ ProdutorModel.init(
     tableName: "T_PRODUTOR",
   }
 );
-
-ProdutorModel.hasMany(FazendaModel, {
-  foreignKey: "ProdutorId",
-  as: "T_FAZENDA",
-});
 
 export { ProdutorModel };

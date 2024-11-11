@@ -1,40 +1,21 @@
-import { Request, Response } from "express";
 import { sequelize } from "@configuracoes/sequelize";
-import { FazendaService } from "@servicos/FazendaService";
-import { ProdutorService } from "@servicos/ProdutorService";
+import { CulturaService } from "@servicos/CulturaService";
 import { ServicoException } from "@utilidades/Error";
 import { RespostaPadrao } from "@utilidades/RespostaPadrao";
+import { Request, Response } from "express";
 
-export  class ProdutorController {
+export  class CulturaController {
+  //#region Metodos Publicos
   static async Inserir(request: Request, response: Response): Promise<void> {
     const transacao = await sequelize.transaction();
     try {
-      const { nome, cpf_cnpj, fazendas } = request.body;
-
-      const produtorServico = new ProdutorService();
-      const produtor = await produtorServico.BuscarProdutorPorCPF_CNPJ(
-        cpf_cnpj
-      );
-
-      if (produtor) throw new ServicoException("Usuario ja possui cadastro ");
-      const produtorCriado = await produtorServico.Criar(
-        {
-          CpfCnpj: cpf_cnpj,
-          Nome: nome,
-        },
-        transacao
-      );
-      const fazendaServico = new FazendaService();
-      await fazendaServico.CriarFazendas(
-        produtorCriado.Id,
-        fazendas,
-        transacao
-      );
-
+      const { Nome } = request.body;
+      const servicoCultura = new CulturaService();
+      await servicoCultura.Criar({ Nome: Nome }, transacao);
       await transacao.commit();
       response
         .status(201)
-        .json(new RespostaPadrao(true, "Usuario criado com sucesso"));
+        .json(new RespostaPadrao(true, "Cultura criada com sucesso"));
     } catch (error) {
       await transacao.rollback();
       if (error instanceof ServicoException) {
@@ -45,25 +26,19 @@ export  class ProdutorController {
       }
       response
         .status(400)
-        .json({ error: "Ocorreu um erro ao tentar criar o usuario" });
+        .json({ error: "Ocorreu um erro ao tentar criar cultura" });
     }
   }
 
   static async Atualizar(request: Request, response: Response): Promise<void> {
     const transacao = await sequelize.transaction();
     try {
-      const { id, nome, cpf_cnpj, fazendas } = request.body;
-
-      const produtorServico = new ProdutorService();
-      await produtorServico.Atualizar(id, { Nome: nome, CpfCnpj: cpf_cnpj },transacao);
-
-      const fazendaServico = new FazendaService();
-
-      await fazendaServico.AtualizarFazendas(Number(id), fazendas,transacao);
+      const { Nome, Id } = request.body;
+      const servicoCultura = new CulturaService();
+      await servicoCultura.Atualizar({ Nome: Nome, Id: Id }, transacao);
       await transacao.commit();
       response.status(200).json({ message: "Registro atualizado com sucesso" });
     } catch (error) {
-      console.log(error)
       await transacao.rollback();
       if (error instanceof ServicoException) {
         response
@@ -71,10 +46,9 @@ export  class ProdutorController {
           .json(new RespostaPadrao(false, error.message));
         return;
       }
-
       response
         .status(400)
-        .json({ error: "Ocorreu um erro ao tentar atualizar o produtor" });
+        .json({ error: "Ocorreu um erro ao tentar atualizar o cultura" });
     }
   }
 
@@ -82,12 +56,12 @@ export  class ProdutorController {
     const transacao = await sequelize.transaction();
     try {
       const { id } = request.params;
-      const produtorServico = new ProdutorService();
-      await produtorServico.Remover(Number(id), transacao);
+      const servicoCultura = new CulturaService();
+      await servicoCultura.Remover(Number(id), transacao);
       await transacao.commit();
       response
         .status(200)
-        .json(new RespostaPadrao(true, "Produtor removido com sucesso"));
+        .json(new RespostaPadrao(true, "Cultura removida com sucesso"));
     } catch (error) {
       await transacao.rollback();
       if (error instanceof ServicoException) {
@@ -102,7 +76,7 @@ export  class ProdutorController {
         .json(
           new RespostaPadrao(
             false,
-            "Ocorreu um erro ao tentar remover o produtor"
+            "Ocorreu um erro ao tentar remover o cultura"
           )
         );
     }
@@ -114,26 +88,24 @@ export  class ProdutorController {
   ): Promise<void> {
     try {
       const { id } = request.params;
-      const produtorServico = new ProdutorService();
-      const produtor = await produtorServico.ObterInformacoesPorId(Number(id));
-      response.status(200).json(new RespostaPadrao(produtor));
+      const servicoCultura = new CulturaService();
+      const cultura = await servicoCultura.BuscarInformacoesPorCodigo(
+        Number(id)
+      );
+      response.status(200).json(new RespostaPadrao(cultura));
     } catch (error) {
- 
       if (error instanceof ServicoException) {
         response
           .status(error.statusCode)
           .json(new RespostaPadrao(false, error.message));
         return;
       }
-
       response
         .status(400)
         .json(
-          new RespostaPadrao(
-            false,
-            "Ocorreu um erro ao tentar buscar o usuario"
-          )
+          new RespostaPadrao(false, "Ocorreu um erro ao tentar buscar cultura")
         );
     }
   }
+  //#endregion
 }

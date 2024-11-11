@@ -1,19 +1,23 @@
 import { Model, Optional, DataTypes } from "sequelize";
-import { ProdutorModel } from "./ProdutorModel";
-import { sequelize } from "../config/sequelize";
+import { sequelize } from "@configuracoes/sequelize";
+import { ProdutorModel } from "@modelos/ProdutorModel";
+import { CulturaModel } from "./CulturaModel";
 
-interface IFazendaAtributos {
+export interface IFazendaAtributos {
   Id: number;
   ProdutorId: number;
   Nome: string;
   Cidade: string;
   Estado: string;
   AreaTotal: number;
-  AreaAgrucultavel: number;
+  AreaAgricultavel: number;
   AreaVegetacao: number;
 }
 
-interface IFazendaAtributosCriacao extends Optional<IFazendaAtributos, "Id"> {}
+export interface IFazendaAtributosCriacao
+  extends Optional<IFazendaAtributos, "Id"> {
+  Culturas?: number[];
+}
 
 class FazendaModel
   extends Model<IFazendaAtributos, IFazendaAtributosCriacao>
@@ -25,12 +29,14 @@ class FazendaModel
   public Cidade!: string;
   public Estado!: string;
   public AreaTotal!: number;
-  public AreaAgrucultavel!: number;
+  public AreaAgricultavel!: number;
   public AreaVegetacao!: number;
 
+  public readonly CulturasVinculadas?: CulturaModel[];
   public readonly DataCriacao!: Date;
   public readonly DataUltimaAtualizacao!: Date;
 }
+
 FazendaModel.init(
   {
     Id: {
@@ -42,7 +48,7 @@ FazendaModel.init(
       type: DataTypes.STRING,
       allowNull: false,
     },
-    AreaAgrucultavel: {
+    AreaAgricultavel: {
       type: DataTypes.INTEGER,
       allowNull: false,
     },
@@ -51,7 +57,7 @@ FazendaModel.init(
       allowNull: false,
     },
     Cidade: {
-      type: DataTypes.INTEGER,
+      type: DataTypes.STRING,
       allowNull: false,
     },
     AreaVegetacao: {
@@ -59,12 +65,13 @@ FazendaModel.init(
       allowNull: false,
     },
     Estado: {
-      type: DataTypes.INTEGER,
+      type: DataTypes.STRING,
       allowNull: false,
     },
     ProdutorId: {
       type: DataTypes.INTEGER,
-      references: { model: "Produtor", key: "Id" },
+      allowNull: false,
+      references: { model: "T_PRODUTOR", key: "Id" },
     },
   },
   {
@@ -78,4 +85,10 @@ FazendaModel.belongsTo(ProdutorModel, {
   foreignKey: "ProdutorId",
   as: "Produtor",
 });
+
+ProdutorModel.hasMany(FazendaModel, {
+  foreignKey: "ProdutorId",
+  as: "Fazenda",
+});
+
 export { FazendaModel };
