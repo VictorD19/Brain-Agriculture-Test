@@ -1,4 +1,3 @@
-import { sequelize } from "@configuracoes/sequelize";
 import { CulturaModel, ICulturaCriacaoAtributos } from "@modelos/CulturaModel";
 import { CulturaRepositorio } from "@repositorios/CulturaRepositorio";
 import { ServicoException } from "@utilidades/Error";
@@ -10,8 +9,8 @@ export class CulturaService {
   //#endregion
 
   //#region  Construtores
-  constructor() {
-    this._repositorioCultura = new CulturaRepositorio(CulturaModel);
+  constructor(repositorioCultura?: CulturaRepositorio) {
+    this._repositorioCultura = repositorioCultura || new CulturaRepositorio(CulturaModel);
   }
   //#endregion
 

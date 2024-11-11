@@ -1,41 +1,52 @@
+// jest.mock("@modelos/ProdutorModel",()=>{
+//   return {
+//     ProdutorModel: jest.fn()
+//   };
+// })
+
+// jest.mock("@modelos/FazendaModel",()=>{
+//   return {
+//     FazendaModel: jest.fn()  };
+// })
+
+// jest.mock("@modelos/CulturaModel",()=>{
+//   return {
+//     CulturaModel: jest.fn()}
+// })
+
+// jest.mock('@servicos/FazendaCulturaService', () => {
+//   return {
+//     FazendaCulturaService: jest.fn()}
+// });
+
+// jest.mock('@repositorios/FazendaRepositorio', () => {
+//   return {
+//     FazendaRepositorio: jest.fn()
+//   };
+// });
 
 
-jest.mock("@modelos/ProdutorModel",()=>{
-  return {
-    ProdutorModel: jest.fn()
-  };
-})
 
-jest.mock("@modelos/FazendaModel",()=>{
-  return {
-    FazendaModel: jest.fn()  };
-})
-
-jest.mock("@modelos/CulturaModel",()=>{
-  return {
-    CulturaModel: jest.fn()}
-})
-
-jest.mock('@servicos/FazendaCulturaService', () => {
-  return {
-    FazendaCulturaService: jest.fn()}
-});
-
-jest.mock('@repositorios/FazendaRepositorio', () => {
-  return {
-    FazendaRepositorio: jest.fn()
-  };
-});
-
-import { IFazendaAtributosCriacao } from "@modelos/FazendaModel";
+import { IFazendaAtributosCriacao,FazendaModel } from "@modelos/FazendaModel";
+import { FazendaRepositorio } from "@repositorios/FazendaRepositorio";
 import {FazendaService} from "@servicos/FazendaService"
+import {FazendaCulturaService} from "@servicos/FazendaCulturaService"
+
+jest.mock("@repositorios/FazendaRepositorio");
+jest.mock("@servicos/FazendaCulturaService");
+jest.mock("@configuracoes/sequelize");
+
 
 describe('Testes de Validação de Dados para Criação de Fazenda', () => {
     
   let fazendaService: FazendaService;
+  let fazendaRepositorioMock: jest.Mocked<FazendaRepositorio>;
+  let fazendaCulturaServiceMock: jest.Mocked<FazendaCulturaService>;
 
   beforeEach(() => {
-    fazendaService = new FazendaService();
+    fazendaRepositorioMock = new FazendaRepositorio(FazendaModel) as jest.Mocked<FazendaRepositorio>;
+    fazendaCulturaServiceMock = new FazendaCulturaService() as jest.Mocked<FazendaCulturaService>;
+    fazendaService = new FazendaService(fazendaRepositorioMock,fazendaCulturaServiceMock);
   });
 
 

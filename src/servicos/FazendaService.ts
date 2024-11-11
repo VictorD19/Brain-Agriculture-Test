@@ -3,15 +3,18 @@ import { FazendaRepositorio } from "@repositorios/FazendaRepositorio";
 import { ServicoException } from "@utilidades/Error";
 import { FazendaModel, IFazendaAtributosCriacao } from "@modelos/FazendaModel";
 import { FazendaCulturaService } from "./FazendaCulturaService";
+import { FazendaCulturaRepositorio } from "@repositorios/FazendaCulturaRepositorio";
 
 export class FazendaService {
   //#region Atributos
   private readonly _repositorioFazenda: FazendaRepositorio;
+  private readonly _servicoFazendaCultura: FazendaCulturaService;
   //#endregion
 
   //#region Constructores
-  constructor() {
-    this._repositorioFazenda = new FazendaRepositorio(FazendaModel);
+  constructor(repositorioFazenda?:FazendaRepositorio,fazendaCulturaService?: FazendaCulturaService) {
+    this._repositorioFazenda = repositorioFazenda || new FazendaRepositorio(FazendaModel);
+    this._servicoFazendaCultura = fazendaCulturaService || new FazendaCulturaService();
   }
   //#endregion
 
@@ -21,7 +24,6 @@ export class FazendaService {
     fazendas: IFazendaAtributosCriacao[],
     transaction?: Transaction
   ): Promise<void> {
-    const servicoFazendaCultura = new FazendaCulturaService();
     for (let i = 0; i < fazendas.length; i++) {
       const fazendaCriar: IFazendaAtributosCriacao = fazendas[i];
 
@@ -36,7 +38,7 @@ export class FazendaService {
       if (fazendaCriar.Culturas != null && fazendaCriar.Culturas.length > 0) {
    
         for (let i = 0; i < (fazendaCriar?.Culturas?.length ?? 0); i++) {
-          await servicoFazendaCultura.VincularCulturaComFazendaPorId(fazendaCriada.Id,fazendaCriar.Culturas[i],transaction)
+          await this._servicoFazendaCultura.VincularCulturaComFazendaPorId(fazendaCriada.Id,fazendaCriar.Culturas[i],transaction)
         }
       }
     }
@@ -68,8 +70,6 @@ export class FazendaService {
       }
     }
 
-    const servicoFazendaCultura = new FazendaCulturaService();
-
     for (let i = 0; i < fazendas.length; i++) {
       const fazendaAtualizar: IFazendaAtributosCriacao = fazendas[i];
 
@@ -97,12 +97,12 @@ export class FazendaService {
         fazendaAtualizar.Culturas == null ||
         fazendaAtualizar.Culturas.length == 0
       ) {
-        await servicoFazendaCultura.RemoverPorFazendaId(fazenda.Id);
+        await this._servicoFazendaCultura.RemoverPorFazendaId(fazenda.Id);
         continue;
       }
 
       for (let i = 0; i < (fazendaAtualizar?.Culturas?.length ?? 0); i++) {
-        await servicoFazendaCultura.VincularCulturaComFazendaPorId(   fazenda.Id,
+        await this._servicoFazendaCultura.VincularCulturaComFazendaPorId(   fazenda.Id,
           fazendaAtualizar.Culturas[i],
           transaction
         );

@@ -8,13 +8,13 @@ import { ServicoException } from "@utilidades/Error";
 export class FazendaCulturaService {
   //#region Atributos
   private readonly _repositorioFazendaCultura: FazendaCulturaRepositorio;
+  private readonly _servicoCultura: CulturaService;
   //#endregion
 
   //#region  Construtores
-  constructor() {
-    this._repositorioFazendaCultura = new FazendaCulturaRepositorio(
-      FazendaCulturaModel
-    );
+  constructor(repositorioFazenda?: FazendaCulturaRepositorio,servicoCultura?:CulturaService ) {
+    this._repositorioFazendaCultura = repositorioFazenda || new FazendaCulturaRepositorio(FazendaCulturaModel);
+    this._servicoCultura = servicoCultura || new CulturaService();
   }
   //#endregion
 
@@ -51,9 +51,8 @@ export class FazendaCulturaService {
     idCultura: number,
     transition?: Transaction
   ): Promise<void> {
-    const servicoCultura = new CulturaService();
 
-    if (!(await servicoCultura.ExisteCulturaPorId(idCultura)))
+    if (!(await this._servicoCultura.ExisteCulturaPorId(idCultura)))
       throw new ServicoException(`A cultura ${idCultura} não esta cadastrada`);
 
     if (
