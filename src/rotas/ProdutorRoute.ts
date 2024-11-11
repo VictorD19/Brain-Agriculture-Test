@@ -1,4 +1,4 @@
-import { ProdutorController } from "@controllers/ProdutorController";
+import { ProdutorController } from "controladores/ProdutorController";
 import { Router } from "express";
 const router: Router = Router();
 router.get("/:id", ProdutorController.BuscarPorCodigo);

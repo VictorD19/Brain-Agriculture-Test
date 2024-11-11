@@ -1,4 +1,4 @@
-import { DashboardController } from "@controllers/DashboardController";
+import { DashboardController } from "controladores/DashboardController";
 import { Router } from "express";
 
 const router = Router();

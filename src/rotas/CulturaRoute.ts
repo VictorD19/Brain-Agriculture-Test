@@ -1,6 +1,6 @@
 import { Router } from "express";
 
-import {CulturaController} from "@controllers/CulturaController";
+import {CulturaController} from "controladores/CulturaController";
 const router: Router = Router();
 router.get("/:id", CulturaController.BuscarPorCodigo);
 router.post("/inserir", CulturaController.Inserir);

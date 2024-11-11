@@ -9,7 +9,6 @@ export class DashboardController {
       const ObterResumoTotal = await servicoDashboard.ObteResumoDados();
       response.status(200).json(new RespostaPadrao(ObterResumoTotal));
     } catch (error) {
-      console.log(error)
       response
         .status(400)
         .json(new RespostaPadrao(false, "Não foi possivel obter os dados"));

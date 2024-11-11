@@ -74,6 +74,7 @@ export class FazendaService {
       const fazendaAtualizar: IFazendaAtributosCriacao = fazendas[i];
 
       this.ValidarDadosFazenda(fazendaAtualizar);
+      
       let fazenda: FazendaModel;
       if (!fazendaAtualizar.Id || fazendaAtualizar.Id == 0)
         fazenda = await this._repositorioFazenda.Inserir(
@@ -134,7 +135,7 @@ export class FazendaService {
   //#endregion
 
   //#region  Metodos Privados
-  ValidarDadosFazenda(fazendaCriar: IFazendaAtributosCriacao): void {
+   ValidarDadosFazenda(fazendaCriar: IFazendaAtributosCriacao): void {
     if (!fazendaCriar.Nome)
       throw new ServicoException("Precisa informar um nome para sua fazenda");
 
@@ -164,7 +165,7 @@ export class FazendaService {
       fazendaCriar.AreaTotal
     )
       throw new ServicoException(
-        `A soma da área de vegetação e a área agricultavel da fazenda '${fazendaCriar.Nome}' não pode ser maior que a área total`
+        `A soma da área de vegetação e a área agricultável da fazenda '${fazendaCriar.Nome}' não pode ser maior que a área total`
       );
   }
   //#endregion

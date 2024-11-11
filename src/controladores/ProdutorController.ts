@@ -63,7 +63,6 @@ export  class ProdutorController {
       await transacao.commit();
       response.status(200).json({ message: "Registro atualizado com sucesso" });
     } catch (error) {
-      console.log(error)
       await transacao.rollback();
       if (error instanceof ServicoException) {
         response

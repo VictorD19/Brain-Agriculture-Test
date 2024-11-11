@@ -112,8 +112,11 @@ export class Validacoes {
     return false;
   }
 
-  public static ValidarCPFCNPJValido(): boolean {
-    return true;
+  public static ValidarCPFCNPJValido(cpfCnpj: string): boolean {
+
+    const cpfValido:boolean = this.ValidarCPF(cpfCnpj);
+    const cnpjValido:boolean= this.ValidarCNPJ(cpfCnpj);
+    return cpfValido || cnpjValido;
   }
   //#endregion
 
