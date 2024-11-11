@@ -64,7 +64,7 @@ export class ProdutorService {
     produtor: IProdutorAtributosCriacao,
     transaction?: Transaction
   ): Promise<ProdutorModel> {
-    if (!Validacoes.ValidarCPFCNPJValido())
+    if (!Validacoes.ValidarCPFCNPJValido(produtor.CpfCnpj))
       throw new ServicoException(`CPF ou CNPJ invalido`);
     return await this._repositorioProdutor.Inserir(produtor, transaction);
   }
