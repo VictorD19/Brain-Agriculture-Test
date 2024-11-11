@@ -1,6 +1,5 @@
 import { Model, Optional, DataTypes } from "sequelize";
 import { sequelize } from "@configuracoes/sequelize";
-import { ProdutorModel } from "@modelos/ProdutorModel";
 import { CulturaModel } from "./CulturaModel";
 
 export interface IFazendaAtributos {
@@ -81,14 +80,6 @@ FazendaModel.init(
   }
 );
 
-FazendaModel.belongsTo(ProdutorModel, {
-  foreignKey: "ProdutorId",
-  as: "Produtor",
-});
 
-ProdutorModel.hasMany(FazendaModel, {
-  foreignKey: "ProdutorId",
-  as: "Fazenda",
-});
 
 export { FazendaModel };

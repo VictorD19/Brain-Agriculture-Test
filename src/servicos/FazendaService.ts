@@ -2,77 +2,62 @@ import { Transaction } from "sequelize";
 import { FazendaRepositorio } from "@repositorios/FazendaRepositorio";
 import { ServicoException } from "@utilidades/Error";
 import { FazendaModel, IFazendaAtributosCriacao } from "@modelos/FazendaModel";
-import { FazendaCulturaService } from "./FazendaCulturaService";
-import { FazendaCulturaRepositorio } from "@repositorios/FazendaCulturaRepositorio";
 
 export class FazendaService {
   //#region Atributos
   private readonly _repositorioFazenda: FazendaRepositorio;
-  private readonly _servicoFazendaCultura: FazendaCulturaService;
   //#endregion
 
   //#region Constructores
-  constructor(repositorioFazenda?:FazendaRepositorio,fazendaCulturaService?: FazendaCulturaService) {
+  constructor(repositorioFazenda?:FazendaRepositorio) {
     this._repositorioFazenda = repositorioFazenda || new FazendaRepositorio(FazendaModel);
-    this._servicoFazendaCultura = fazendaCulturaService || new FazendaCulturaService();
   }
   //#endregion
 
   //#region Metodos Publicos
   async CriarFazendas(
     idProdutor: number,
-    fazendas: IFazendaAtributosCriacao[],
+    fazendaCriar: IFazendaAtributosCriacao,
     transaction?: Transaction
-  ): Promise<void> {
-    for (let i = 0; i < fazendas.length; i++) {
-      const fazendaCriar: IFazendaAtributosCriacao = fazendas[i];
-
+  ): Promise<number> {
       this.ValidarDadosFazenda(fazendaCriar);
-
       const fazendaCriada: FazendaModel =
         await this._repositorioFazenda.Inserir(
           { ...fazendaCriar, ProdutorId: idProdutor },
           transaction
         );
-
-      if (fazendaCriar.Culturas != null && fazendaCriar.Culturas.length > 0) {
-   
-        for (let i = 0; i < (fazendaCriar?.Culturas?.length ?? 0); i++) {
-          await this._servicoFazendaCultura.VincularCulturaComFazendaPorId(fazendaCriada.Id,fazendaCriar.Culturas[i],transaction)
-        }
-      }
-    }
+      return fazendaCriada.Id;
   }
+
+async  RemoverFazendaNaoInclusas(idProdutor:number,fazendas: IFazendaAtributosCriacao[],transaction?: Transaction): Promise<void>{
+  const fazendasProdutor =
+  await this._repositorioFazenda.BuscarFazendasPorIDProdutor(idProdutor);
+
+if (fazendasProdutor != null && fazendasProdutor.length > 0) {
+  const codigosFazendasManter: number[] = [];
+
+  fazendas.forEach((fazenda) => {
+    if (fazenda.Id != null && fazenda?.Id > 0)
+      codigosFazendasManter.push(fazenda.Id);
+  });
+
+  const fazendasRemover = fazendasProdutor.filter(
+    (fazenda) => !codigosFazendasManter.includes(fazenda.Id)
+  );
+
+  for (let i = 0; i < fazendasRemover.length; i++) {
+    const fazendaRemover = fazendasRemover[i];
+    await this._repositorioFazenda.Deletar(fazendaRemover.Id, transaction);
+  }
+}
+}
 
   async AtualizarFazendas(
     idProdutor: number,
-    fazendas: IFazendaAtributosCriacao[],
+    fazendaAtualizar: IFazendaAtributosCriacao,
     transaction?: Transaction
-  ): Promise<void> {
-    const fazendasProdutor =
-      await this._repositorioFazenda.BuscarFazendasPorIDProdutor(idProdutor);
-
-    if (fazendasProdutor != null && fazendasProdutor.length > 0) {
-      const codigosFazendasManter: number[] = [];
-
-      fazendas.forEach((fazenda) => {
-        if (fazenda.Id != null && fazenda?.Id > 0)
-          codigosFazendasManter.push(fazenda.Id);
-      });
-
-      const fazendasRemover = fazendasProdutor.filter(
-        (fazenda) => !codigosFazendasManter.includes(fazenda.Id)
-      );
-
-      for (let i = 0; i < fazendasRemover.length; i++) {
-        const fazendaRemover = fazendasRemover[i];
-        await this._repositorioFazenda.Deletar(fazendaRemover.Id, transaction);
-      }
-    }
-
-    for (let i = 0; i < fazendas.length; i++) {
-      const fazendaAtualizar: IFazendaAtributosCriacao = fazendas[i];
-
+  ): Promise<number> {
+    
       this.ValidarDadosFazenda(fazendaAtualizar);
       
       let fazenda: FazendaModel;
@@ -92,22 +77,7 @@ export class FazendaService {
         );
         fazenda = fazendaAtualizada[0];
       }
-
-      if (
-        fazendaAtualizar.Culturas == null ||
-        fazendaAtualizar.Culturas.length == 0
-      ) {
-        await this._servicoFazendaCultura.RemoverPorFazendaId(fazenda.Id);
-        continue;
-      }
-
-      for (let i = 0; i < (fazendaAtualizar?.Culturas?.length ?? 0); i++) {
-        await this._servicoFazendaCultura.VincularCulturaComFazendaPorId(   fazenda.Id,
-          fazendaAtualizar.Culturas[i],
-          transaction
-        );
-      }
-    }
+return fazenda.Id;
   }
 
   async ObterCodigosFazendaPorProdutor(idProdutor: number): Promise<number[]> {
