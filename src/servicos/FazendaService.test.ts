@@ -166,3 +166,70 @@ describe("Testes de Validação de Dados para Criação de Fazenda", () => {
     );
   });
 });
+
+let fazendaService: FazendaService;
+let fazendaRepositorioMock: jest.Mocked<FazendaRepositorio>;
+
+const mockFazenda: IFazendaAtributosCriacao = {
+  ProdutorId: 1,
+  Nome: "Fazenda Teste",
+  Estado: "São Paulo",
+  Cidade: "Campinas",
+  AreaAgricultavel: 500,
+  AreaTotal: 1000,
+  AreaVegetacao: 300,
+};
+
+beforeEach(() => {
+  const FazendaModelMock = FazendaModel as jest.Mocked<typeof FazendaModel>;
+  fazendaRepositorioMock = new FazendaRepositorio(
+    FazendaModelMock
+  ) as jest.Mocked<FazendaRepositorio>;
+  fazendaService = new FazendaService(fazendaRepositorioMock);
+});
+
+describe("CriarFazendas", () => {
+  it("deve criar uma nova fazenda com sucesso", async () => {
+    const mockFazendaCriada = { ...mockFazenda, Id: 1 } as FazendaModel;
+    fazendaRepositorioMock.Inserir.mockResolvedValue(mockFazendaCriada);
+
+    const resultado = await fazendaService.CriarFazendas(1, mockFazenda);
+
+    expect(resultado).toBe(1);
+    expect(fazendaRepositorioMock.Inserir).toHaveBeenCalledWith(
+      expect.objectContaining(mockFazenda),
+      undefined
+    );
+  });
+});
+
+describe("AtualizarFazendas", () => {
+  it("deve atualizar uma fazenda existente", async () => {
+    const fazendaAtualizada = { ...mockFazenda, Id: 1 } as FazendaModel;
+    fazendaRepositorioMock.Atualizar.mockResolvedValue([
+      1,
+      [fazendaAtualizada],
+    ]);
+
+    const resultado = await fazendaService.AtualizarFazendas(1, {
+      ...mockFazenda,
+      Id: 1,
+    });
+
+    expect(resultado).toBe(1);
+    expect(fazendaRepositorioMock.Atualizar).toHaveBeenCalled();
+  });
+
+  it("deve criar nova fazenda quando Id não for fornecido", async () => {
+    const mockFazendaCriada = { ...mockFazenda, Id: 1 } as FazendaModel;
+    fazendaRepositorioMock.Inserir.mockResolvedValue(mockFazendaCriada);
+
+    const resultado = await fazendaService.AtualizarFazendas(1, {
+      ...mockFazenda,
+      Id: 0,
+    });
+
+    expect(resultado).toBe(1);
+    expect(fazendaRepositorioMock.Inserir).toHaveBeenCalled();
+  });
+});
