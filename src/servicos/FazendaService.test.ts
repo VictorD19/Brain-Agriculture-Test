@@ -1,40 +1,26 @@
-// jest.mock("@modelos/ProdutorModel",()=>{
-//   return {
-//     ProdutorModel: jest.fn()
-//   };
-// })
-
-// jest.mock("@modelos/FazendaModel",()=>{
-//   return {
-//     FazendaModel: jest.fn()  };
-// })
-
-// jest.mock("@modelos/CulturaModel",()=>{
-//   return {
-//     CulturaModel: jest.fn()}
-// })
-
-// jest.mock('@servicos/FazendaCulturaService', () => {
-//   return {
-//     FazendaCulturaService: jest.fn()}
-// });
-
-// jest.mock('@repositorios/FazendaRepositorio', () => {
-//   return {
-//     FazendaRepositorio: jest.fn()
-//   };
-// });
-
 import { IFazendaAtributosCriacao, FazendaModel } from "@modelos/FazendaModel";
 import { FazendaRepositorio } from "@repositorios/FazendaRepositorio";
 import { FazendaService } from "@servicos/FazendaService";
-import "sequelize";
 
+jest.mock("@configuracoes/sequelize", () => {
+  return {
+    serialize: jest.fn(),
+  };
+});
 jest.mock("@repositorios/FazendaRepositorio");
-jest.mock("@modelos/FazendaModel");
+jest.mock("@modelos/FazendaModel", () => {
+  return {
+    FazendaModel: jest.fn(),
+  };
+});
 jest.mock("@modelos/ProdutorModel", () => {
   return {
     ProdutorModel: jest.fn(),
+  };
+});
+jest.mock("@modelos/CulturaModel", () => {
+  return {
+    CulturaModel: jest.fn(),
   };
 });
 
