@@ -14,7 +14,7 @@ import { IFazendaAtributosCriacao } from "@modelos/FazendaModel";
  *   description: Endpoints relacionados ao produtores
  */
 
-export  class ProdutorController {
+export class ProdutorController {
   static async Inserir(request: Request, response: Response): Promise<void> {
     const transacao = await sequelize.transaction();
     try {
@@ -37,11 +37,19 @@ export  class ProdutorController {
       const fazendaCulturaServico = new FazendaCulturaService();
 
       for (let i = 0; i < fazendas.length; i++) {
-        const fazendaCriar:IFazendaAtributosCriacao = fazendas[i];
-        const idFazendaCriada:number = await fazendaServico.CriarFazendas(produtorCriado.Id,fazendaCriar,transacao);
+        const fazendaCriar: IFazendaAtributosCriacao = fazendas[i];
+        const idFazendaCriada: number = await fazendaServico.CriarFazendas(
+          produtorCriado.Id,
+          fazendaCriar,
+          transacao
+        );
         if (fazendaCriar.Culturas != null && fazendaCriar.Culturas.length > 0) {
           for (let i = 0; i < (fazendaCriar?.Culturas?.length ?? 0); i++) {
-            await fazendaCulturaServico.VincularCulturaComFazendaPorId(idFazendaCriada,fazendaCriar.Culturas[i],transacao)
+            await fazendaCulturaServico.VincularCulturaComFazendaPorId(
+              idFazendaCriada,
+              fazendaCriar.Culturas[i],
+              transacao
+            );
           }
         }
       }
@@ -70,26 +78,42 @@ export  class ProdutorController {
       const { id, nome, cpf_cnpj, fazendas } = request.body;
 
       const produtorServico = new ProdutorService();
-      await produtorServico.Atualizar(id, { Nome: nome, CpfCnpj: cpf_cnpj },transacao);
+      await produtorServico.Atualizar(
+        id,
+        { Nome: nome, CpfCnpj: cpf_cnpj },
+        transacao
+      );
 
       const fazendaServico = new FazendaService();
       const fazendaCulturaServico = new FazendaCulturaService();
 
-      await  fazendaServico.RemoverFazendaNaoInclusas(id,fazendas,transacao);
+      await fazendaServico.RemoverFazendaNaoInclusas(id, fazendas, transacao);
 
       for (let i = 0; i < fazendas.length; i++) {
-        const fazendaProcessar:IFazendaAtributosCriacao = fazendas[i];
-        const idFazendaAtualizar:number = await fazendaServico.AtualizarFazendas(Number(id), fazendaProcessar,transacao);
-        
-      if (fazendaProcessar.Culturas == null ||fazendaProcessar.Culturas.length == 0) {
-        await fazendaCulturaServico.RemoverPorFazendaId(idFazendaAtualizar);
-        continue;
+        const fazendaProcessar: IFazendaAtributosCriacao = fazendas[i];
+        const idFazendaAtualizar: number =
+          await fazendaServico.AtualizarFazendas(
+            Number(id),
+            fazendaProcessar,
+            transacao
+          );
+
+        if (
+          fazendaProcessar.Culturas == null ||
+          fazendaProcessar.Culturas.length == 0
+        ) {
+          await fazendaCulturaServico.RemoverPorFazendaId(idFazendaAtualizar);
+          continue;
+        }
+        for (let i = 0; i < fazendaProcessar.Culturas.length; i++) {
+          await fazendaCulturaServico.VincularCulturaComFazendaPorId(
+            idFazendaAtualizar,
+            fazendaProcessar.Culturas[i],
+            transacao
+          );
+        }
       }
-      for (let i = 0; i < fazendaProcessar.Culturas.length; i++) {
-        await fazendaCulturaServico.VincularCulturaComFazendaPorId(idFazendaAtualizar,fazendaProcessar.Culturas[i],transacao)
-      }
-      }
- 
+
       await transacao.commit();
       response.status(200).json({ message: "Registro atualizado com sucesso" });
     } catch (error) {
@@ -147,7 +171,6 @@ export  class ProdutorController {
       const produtor = await produtorServico.ObterInformacoesPorId(Number(id));
       response.status(200).json(new RespostaPadrao(produtor));
     } catch (error) {
- 
       if (error instanceof ServicoException) {
         response
           .status(error.statusCode)
@@ -166,5 +189,25 @@ export  class ProdutorController {
     }
   }
 
-  static async Pesquisar(request: Request, response: Response): Promise<void>{}
+  static async Pesquisar(request: Request, response: Response): Promise<void> {
+    try {
+      console.log("incies")
+      const servicoProdutor = new ProdutorService();
+      console.log("instanciado")
+      const produtores = await servicoProdutor.ObterProdutores();
+      console.log("consultado")
+      console.log(produtores);
+      response.status(200).json(new RespostaPadrao(produtores));
+    } catch (error) {
+      console.log(error);
+      response
+        .status(400)
+        .json(
+          new RespostaPadrao(
+            false,
+            "Ocorreu um erro ao tentar buscar os produtores"
+          )
+        );
+    }
+  }
 }

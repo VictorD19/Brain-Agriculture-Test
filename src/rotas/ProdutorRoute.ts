@@ -4,6 +4,49 @@ const router: Router = Router();
 
 /**
  * @swagger
+ * /produtor/produtores:
+ *   get:
+ *     summary: Obtém uma lista de produtores
+ *     tags:
+ *       - Produtor
+ *     responses:
+ *       200:
+ *         description: Lista de produtores obtida com sucesso
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: array
+ *               items:
+ *                 type: object
+ *                 properties:
+ *                   id:
+ *                     type: integer
+ *                     example: 1
+ *                   nome:
+ *                     type: string
+ *                     example: "João da Silva"
+ *                   cpf_cnpj:
+ *                     type: string
+ *                     example: "12345678901"
+ *       400:
+ *         description: Requisição inválida
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 Sucesso:
+ *                   type: boolean
+ *                   example: false
+ *                 Mensagem:
+ *                   type: string
+ *                   example: "Ocorreu um erro ao tentar buscar os produtore"
+ */
+router.get("/produtores", ProdutorController.Pesquisar);
+
+
+/**
+ * @swagger
  * /produtor/{id}:
  *   get:
  *     summary: Obtem informações de um produtor por ID
@@ -305,6 +348,5 @@ router.patch("/atualizar", ProdutorController.Atualizar);
  */
 router.delete("/remover/:id", ProdutorController.Remover);
 
-router.get("/produtores", ProdutorController.Remover);
 
 export default router;

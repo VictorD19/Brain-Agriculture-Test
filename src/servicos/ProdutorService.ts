@@ -101,5 +101,9 @@ export class ProdutorService {
     this._repositorioProdutor.Atualizar(id, produtor, transacao);
   }
 
+  async ObterProdutores(): Promise<ProdutorModel[]> {
+    return await this._repositorioProdutor.BuscarTodos();
+  }
+
   //#endregion
 }
