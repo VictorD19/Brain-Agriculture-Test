@@ -237,5 +237,5 @@ docker-compose up --build
 
 ## No ar 🚀
 
-Acesse a API em: http://localhost:3000/api-docs para testar os endpoints.
+Acesse [Aqui](http://15.228.146.33:3000/api-docs/) para testar os endpoints.
 
