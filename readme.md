@@ -38,12 +38,13 @@ src/
 Crie um arquivo `.env` na raiz do projeto:
 
 ```env
-DB_HOST=localhost
-DB_PORT=5432
-DB_NAME=brain_agriculture
-DB_USER=seu_usuario
-DB_PASS=sua_senha
 PORT=3000
+DB_NAME=brain-agriculture
+DB_USER=postgres
+DB_PASSWORD=postgres
+DB_HOST=localhost
+DB_DIALECT=postgres
+DB_DATABASE=5433
 ```
 
 ### Instalação Desenvolvimento
