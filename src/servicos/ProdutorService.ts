@@ -12,11 +12,21 @@ import { FazendaModel } from "@modelos/FazendaModel";
 export class ProdutorService {
   //#region Atributos
   private readonly _repositorioProdutor: ProdutorRepositorio;
+  private readonly _servicoFazendaCultura: FazendaCulturaService;
+  private readonly _servicoFazenda: FazendaService;
   //#endregion
 
   //#region Construtores
-  constructor(repositorioProdutor?: ProdutorRepositorio) {
-    this._repositorioProdutor = repositorioProdutor || new ProdutorRepositorio(ProdutorModel);
+  constructor(
+    repositorioProdutor?: ProdutorRepositorio,
+    servicoFazendaCultura?: FazendaCulturaService,
+    servicoFazenda?: FazendaService
+  ) {
+    this._repositorioProdutor =
+      repositorioProdutor || new ProdutorRepositorio(ProdutorModel);
+    this._servicoFazendaCultura =
+      servicoFazendaCultura || new FazendaCulturaService();
+    this._servicoFazenda = servicoFazenda || new FazendaService();
   }
   //#endregion
 
@@ -73,11 +83,9 @@ export class ProdutorService {
     if (!(await this._repositorioProdutor.VerificarUsuarioExistentePorId(id)))
       throw new ServicoException("Produtor não encontrado", 404);
 
-    const servicoFazendaCultura = new FazendaCulturaService();
-    await servicoFazendaCultura.RemoverPorProdutor(id, transacao);
+    await this._servicoFazendaCultura.RemoverPorProdutor(id, transacao);
 
-    const servicoFazenda = new FazendaService();
-    await servicoFazenda.RemoverFazendasPorIdProdutor(id, transacao);
+    await this._servicoFazenda.RemoverFazendasPorIdProdutor(id, transacao);
 
     this._repositorioProdutor.Deletar(id);
   }

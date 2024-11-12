@@ -11,15 +11,17 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.sequelize = void 0;
 const sequelize_1 = require("sequelize");
-const sequelize = new sequelize_1.Sequelize("brain-agriculture", "postgres", "postgres", {
-    host: "localhost",
+const sequelize = new sequelize_1.Sequelize(process.env.DB_NAME || "brain-agriculture", process.env.DB_USER || "postgres", process.env.DB_PASSWORD || "postgres", {
+    host: process.env.HOST || "localhost",
     dialect: "postgres",
+    port: Number(process.env.PORT_DATABASE) || 5433,
+    logging: false,
     define: {
         freezeTableName: true,
     },
 });
 exports.sequelize = sequelize;
 (() => __awaiter(void 0, void 0, void 0, function* () {
-    yield sequelize.sync();
+    yield sequelize.sync({ alter: true });
     console.log("Banco inicializado com sucesso");
 }))();

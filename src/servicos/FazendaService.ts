@@ -9,8 +9,9 @@ export class FazendaService {
   //#endregion
 
   //#region Constructores
-  constructor(repositorioFazenda?:FazendaRepositorio) {
-    this._repositorioFazenda = repositorioFazenda || new FazendaRepositorio(FazendaModel);
+  constructor(repositorioFazenda?: FazendaRepositorio) {
+    this._repositorioFazenda =
+      repositorioFazenda || new FazendaRepositorio(FazendaModel);
   }
   //#endregion
 
@@ -20,64 +21,69 @@ export class FazendaService {
     fazendaCriar: IFazendaAtributosCriacao,
     transaction?: Transaction
   ): Promise<number> {
-      this.ValidarDadosFazenda(fazendaCriar);
-      const fazendaCriada: FazendaModel =
-        await this._repositorioFazenda.Inserir(
-          { ...fazendaCriar, ProdutorId: idProdutor },
-          transaction
-        );
-      return fazendaCriada.Id;
+    
+    const validacoesOk: string = this.ValidarDadosFazenda(fazendaCriar);
+    if (validacoesOk != "") throw new ServicoException(validacoesOk);
+
+    const fazendaCriada: FazendaModel = await this._repositorioFazenda.Inserir(
+      { ...fazendaCriar, ProdutorId: idProdutor },
+      transaction
+    );
+    return fazendaCriada.Id;
   }
 
-async  RemoverFazendaNaoInclusas(idProdutor:number,fazendas: IFazendaAtributosCriacao[],transaction?: Transaction): Promise<void>{
-  const fazendasProdutor =
-  await this._repositorioFazenda.BuscarFazendasPorIDProdutor(idProdutor);
+  async RemoverFazendaNaoInclusas(
+    idProdutor: number,
+    fazendas: IFazendaAtributosCriacao[],
+    transaction?: Transaction
+  ): Promise<void> {
+    const fazendasProdutor =
+      await this._repositorioFazenda.BuscarFazendasPorIDProdutor(idProdutor);
 
-if (fazendasProdutor != null && fazendasProdutor.length > 0) {
-  const codigosFazendasManter: number[] = [];
+    if (fazendasProdutor != null && fazendasProdutor.length > 0) {
+      const codigosFazendasManter: number[] = [];
 
-  fazendas.forEach((fazenda) => {
-    if (fazenda.Id != null && fazenda?.Id > 0)
-      codigosFazendasManter.push(fazenda.Id);
-  });
+      fazendas.forEach((fazenda) => {
+        if (fazenda.Id != null && fazenda?.Id > 0)
+          codigosFazendasManter.push(fazenda.Id);
+      });
 
-  const fazendasRemover = fazendasProdutor.filter(
-    (fazenda) => !codigosFazendasManter.includes(fazenda.Id)
-  );
+      const fazendasRemover = fazendasProdutor.filter(
+        (fazenda) => !codigosFazendasManter.includes(fazenda.Id)
+      );
 
-  for (let i = 0; i < fazendasRemover.length; i++) {
-    const fazendaRemover = fazendasRemover[i];
-    await this._repositorioFazenda.Deletar(fazendaRemover.Id, transaction);
+      for (let i = 0; i < fazendasRemover.length; i++) {
+        const fazendaRemover = fazendasRemover[i];
+        await this._repositorioFazenda.Deletar(fazendaRemover.Id, transaction);
+      }
+    }
   }
-}
-}
 
   async AtualizarFazendas(
     idProdutor: number,
     fazendaAtualizar: IFazendaAtributosCriacao,
     transaction?: Transaction
   ): Promise<number> {
-    
-      this.ValidarDadosFazenda(fazendaAtualizar);
-      
-      let fazenda: FazendaModel;
-      if (!fazendaAtualizar.Id || fazendaAtualizar.Id == 0)
-        fazenda = await this._repositorioFazenda.Inserir(
-          {
-            ...fazendaAtualizar,
-            ProdutorId: idProdutor,
-          },
-          transaction
-        );
-      else {
-        const [_, fazendaAtualizada] = await this._repositorioFazenda.Atualizar(
-          fazendaAtualizar?.Id ?? 0,
-          { ...fazendaAtualizar, ProdutorId: idProdutor },
-          transaction
-        );
-        fazenda = fazendaAtualizada[0];
-      }
-return fazenda.Id;
+    this.ValidarDadosFazenda(fazendaAtualizar);
+
+    let fazenda: FazendaModel;
+    if (!fazendaAtualizar.Id || fazendaAtualizar.Id == 0)
+      fazenda = await this._repositorioFazenda.Inserir(
+        {
+          ...fazendaAtualizar,
+          ProdutorId: idProdutor,
+        },
+        transaction
+      );
+    else {
+      const [_, fazendaAtualizada] = await this._repositorioFazenda.Atualizar(
+        fazendaAtualizar?.Id ?? 0,
+        { ...fazendaAtualizar, ProdutorId: idProdutor },
+        transaction
+      );
+      fazenda = fazendaAtualizada[0];
+    }
+    return fazenda.Id;
   }
 
   async ObterCodigosFazendaPorProdutor(idProdutor: number): Promise<number[]> {
@@ -105,38 +111,31 @@ return fazenda.Id;
   //#endregion
 
   //#region  Metodos Auxiliares
-   ValidarDadosFazenda(fazendaCriar: IFazendaAtributosCriacao): void {
-    if (!fazendaCriar.Nome)
-      throw new ServicoException("Precisa informar um nome para sua fazenda");
+  ValidarDadosFazenda(fazendaCriar: IFazendaAtributosCriacao): string {
+    if (!fazendaCriar.Nome) return "Precisa informar um nome para sua fazenda";
 
     if (!fazendaCriar.Estado)
-      throw new ServicoException(
-        "Precisa informar o estado onde se encontra sua fazenda"
-      );
+      return "Precisa informar o estado onde se encontra sua fazenda";
 
     if (!fazendaCriar.Cidade)
-      throw new ServicoException(
-        "Precisa informar a cidade onde se encontra sua fazenda"
-      );
+      return "Precisa informar a cidade onde se encontra sua fazenda";
 
     if (fazendaCriar.AreaAgricultavel == 0)
-      throw new ServicoException("Precisa informar a área agricultável");
+      return "Precisa informar a área agricultável";
 
     if (fazendaCriar.AreaTotal == 0)
-      throw new ServicoException(
-        "Precisa informar a área total da sua fazenda"
-      );
+      return "Precisa informar a área total da sua fazenda";
 
     if (fazendaCriar.AreaVegetacao == 0)
-      throw new ServicoException("Precisa informar a área de vegetação");
+      return "Precisa informar a área de vegetação";
 
     if (
       fazendaCriar.AreaVegetacao + fazendaCriar.AreaAgricultavel >
       fazendaCriar.AreaTotal
     )
-      throw new ServicoException(
-        `A soma da área de vegetação e a área agricultável da fazenda '${fazendaCriar.Nome}' não pode ser maior que a área total`
-      );
+      return `A soma da área de vegetação e a área agricultável da fazenda '${fazendaCriar.Nome}' não pode ser maior que a área total`;
+
+    return "";
   }
   //#endregion
 }

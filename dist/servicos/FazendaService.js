@@ -10,9 +10,9 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.FazendaService = void 0;
-const FazendaRepositorio_1 = require("@repositorios/FazendaRepositorio");
-const Error_1 = require("@utilidades/Error");
-const FazendaModel_1 = require("@modelos/FazendaModel");
+const FazendaRepositorio_1 = require("../repositorios/FazendaRepositorio");
+const Error_1 = require("../utilidades/Error");
+const FazendaModel_1 = require("../modelos/FazendaModel");
 class FazendaService {
     //#endregion
     //#region Constructores

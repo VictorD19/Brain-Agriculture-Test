@@ -2,9 +2,9 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.FazendaCulturaModel = void 0;
 const sequelize_1 = require("sequelize");
-const sequelize_2 = require("@configuracoes/sequelize");
-const FazendaModel_1 = require("@modelos/FazendaModel");
-const CulturaModel_1 = require("@modelos/CulturaModel");
+const sequelize_2 = require("../configuracoes/sequelize");
+const FazendaModel_1 = require("./FazendaModel");
+const CulturaModel_1 = require("./CulturaModel");
 class FazendaCulturaModel extends sequelize_1.Model {
 }
 exports.FazendaCulturaModel = FazendaCulturaModel;
@@ -27,4 +27,9 @@ CulturaModel_1.CulturaModel.belongsToMany(FazendaModel_1.FazendaModel, {
     through: FazendaCulturaModel,
     as: "Fazendas",
     foreignKey: "CulturaId",
+});
+// Associação com CulturaModel
+FazendaCulturaModel.belongsTo(CulturaModel_1.CulturaModel, {
+    foreignKey: "CulturaId",
+    as: "Cultura",
 });

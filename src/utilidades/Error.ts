@@ -10,6 +10,7 @@ export class ServicoException extends Error {
     this.statusCode = codigo;
     this.isOperational = erroOperacional;
     Object.setPrototypeOf(this, new.target.prototype);
-    Error.captureStackTrace(this);
+    if (typeof Error.captureStackTrace === "function")
+      Error.captureStackTrace(this, this.constructor);
   }
 }

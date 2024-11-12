@@ -305,4 +305,6 @@ router.patch("/atualizar", ProdutorController.Atualizar);
  */
 router.delete("/remover/:id", ProdutorController.Remover);
 
+router.get("/produtores", ProdutorController.Remover);
+
 export default router;

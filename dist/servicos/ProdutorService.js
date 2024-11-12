@@ -10,12 +10,12 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.ProdutorService = void 0;
-const ProdutorRepositorio_1 = require("@repositorios/ProdutorRepositorio");
-const ProdutorModel_1 = require("@modelos/ProdutorModel");
-const Validacoes_1 = require("@utilidades/Validacoes");
-const Error_1 = require("@utilidades/Error");
-const FazendaCulturaService_1 = require("@servicos/FazendaCulturaService");
-const FazendaService_1 = require("@servicos/FazendaService");
+const ProdutorRepositorio_1 = require("../repositorios/ProdutorRepositorio");
+const ProdutorModel_1 = require("../modelos/ProdutorModel");
+const Validacoes_1 = require("../utilidades/Validacoes");
+const Error_1 = require("../utilidades/Error");
+const FazendaCulturaService_1 = require("./FazendaCulturaService");
+const FazendaService_1 = require("./FazendaService");
 class ProdutorService {
     //#endregion
     //#region Construtores

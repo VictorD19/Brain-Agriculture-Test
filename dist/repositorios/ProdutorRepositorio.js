@@ -10,9 +10,9 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.ProdutorRepositorio = void 0;
-const CulturaModel_1 = require("@modelos/CulturaModel");
-const FazendaModel_1 = require("@modelos/FazendaModel");
-const RepositorioBase_1 = require("@repositorios/base/RepositorioBase");
+const CulturaModel_1 = require("../modelos/CulturaModel");
+const FazendaModel_1 = require("../modelos/FazendaModel");
+const RepositorioBase_1 = require("./base/RepositorioBase");
 class ProdutorRepositorio extends RepositorioBase_1.RepositorioBase {
     //#region  Metodos Publicos
     BuscarPorCPF_CNPJ(cpf_cnpj) {

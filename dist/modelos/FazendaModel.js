@@ -2,7 +2,7 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.FazendaModel = void 0;
 const sequelize_1 = require("sequelize");
-const sequelize_2 = require("@configuracoes/sequelize");
+const sequelize_2 = require("../configuracoes/sequelize");
 class FazendaModel extends sequelize_1.Model {
 }
 exports.FazendaModel = FazendaModel;

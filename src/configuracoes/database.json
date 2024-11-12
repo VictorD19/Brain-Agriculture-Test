@@ -3,7 +3,16 @@
     "username": "postgres",
     "password": "postgres",
     "database": "brain-agriculture",
-    "host": "127.0.0.1",
+    "host": "localhost",
+    "port": "5432",
+    "dialect": "postgres"
+  },
+  "production": {
+    "username": "${DB_USER}",
+    "password": "${DB_PASSWORD}",
+    "database": "${DB_NAME}",
+    "host": "${DB_HOST}",
+    "port": "${PORT_DATABASE}",
     "dialect": "postgres"
   }
 }

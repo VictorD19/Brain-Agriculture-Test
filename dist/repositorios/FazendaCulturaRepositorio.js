@@ -10,7 +10,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.FazendaCulturaRepositorio = void 0;
-const RepositorioBase_1 = require("@repositorios/base/RepositorioBase");
+const RepositorioBase_1 = require("./base/RepositorioBase");
 class FazendaCulturaRepositorio extends RepositorioBase_1.RepositorioBase {
     //#region Metodos Publicos
     VincularCulturaComFazenda(idCultura, idFazenda, transaction) {

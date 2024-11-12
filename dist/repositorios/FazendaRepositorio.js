@@ -10,9 +10,9 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.FazendaRepositorio = void 0;
-const RepositorioBase_1 = require("@repositorios/base/RepositorioBase");
-const CulturaModel_1 = require("@modelos/CulturaModel");
-const sequelize_1 = require("@configuracoes/sequelize");
+const RepositorioBase_1 = require("./base/RepositorioBase");
+const CulturaModel_1 = require("../modelos/CulturaModel");
+const sequelize_1 = require("../configuracoes/sequelize");
 class FazendaRepositorio extends RepositorioBase_1.RepositorioBase {
     //#region Metodos Publicos
     BuscarFazendasPorIDProdutor(idProdutor) {
@@ -50,7 +50,7 @@ class FazendaRepositorio extends RepositorioBase_1.RepositorioBase {
     }
     ObterAreaTotalDeTodasAsFazenda() {
         return __awaiter(this, void 0, void 0, function* () {
-            return yield this._modelo.sum("AreaTotal");
+            return (yield this._modelo.sum("AreaTotal")) || 0;
         });
     }
     ObterAreaTotalDeTodasAsFazendaPorProdutor(idProdutor) {
@@ -104,17 +104,17 @@ class FazendaRepositorio extends RepositorioBase_1.RepositorioBase {
     }
     ObterTotalAgricultavelDeTodasAsFazendas() {
         return __awaiter(this, void 0, void 0, function* () {
-            return yield this._modelo.sum("AreaAgricultavel");
+            return (yield this._modelo.sum("AreaAgricultavel")) || 0;
         });
     }
     ObterTotalAgricultavelDeTodasAsFazendasDoProdutor(idProductor) {
         return __awaiter(this, void 0, void 0, function* () {
-            return yield this._modelo.sum("AreaAgricultavel", { where: { ProdutorId: idProductor } });
+            return (yield this._modelo.sum("AreaAgricultavel", { where: { ProdutorId: idProductor } })) || 0;
         });
     }
     ObterTotalVegetacaoDeTodasAsFazendas() {
         return __awaiter(this, void 0, void 0, function* () {
-            return yield this._modelo.sum("AreaVegetacao");
+            return (yield this._modelo.sum("AreaVegetacao")) || 0;
         });
     }
     ObterTotalVegetacaoDeTodasAsFazendasDoProdutor(idProductor) {

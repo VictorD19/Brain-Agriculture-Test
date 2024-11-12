@@ -165,4 +165,6 @@ export  class ProdutorController {
         );
     }
   }
+
+  static async Pesquisar(request: Request, response: Response): Promise<void>{}
 }

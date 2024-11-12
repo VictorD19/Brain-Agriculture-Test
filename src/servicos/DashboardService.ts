@@ -12,9 +12,9 @@ export class DashboardService {
   //#endregion
 
   //#region construtores
-  constructor() {
-    this._repositorioCultura = new CulturaRepositorio(CulturaModel);
-    this._repositorioFazenda = new FazendaRepositorio(FazendaModel);
+  constructor(repositorioCultura?: CulturaRepositorio, repositorioFazenda?: FazendaRepositorio) {
+    this._repositorioCultura = repositorioCultura || new CulturaRepositorio(CulturaModel);
+    this._repositorioFazenda =repositorioFazenda ||  new FazendaRepositorio(FazendaModel);
   }
   //#endregion
 

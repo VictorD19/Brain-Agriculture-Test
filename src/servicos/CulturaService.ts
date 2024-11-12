@@ -68,6 +68,7 @@ export class CulturaService {
       );
     return existeCultura;
   }
+  
   async ExisteCulturaPorId(idCultura: number):Promise<boolean>{
     return await this._repositorioCultura.VerificarSeExistePorId(idCultura);
   }
