@@ -34,20 +34,14 @@ export class FazendaService {
 
   async RemoverFazendaNaoInclusas(
     idProdutor: number,
-    fazendas: IFazendaAtributosCriacao[],
+    codigosFazendasManter: number[],
     transaction?: Transaction
   ): Promise<void> {
     const fazendasProdutor =
       await this._repositorioFazenda.BuscarFazendasPorIDProdutor(idProdutor);
 
     if (fazendasProdutor != null && fazendasProdutor.length > 0) {
-      const codigosFazendasManter: number[] = [];
-
-      fazendas.forEach((fazenda) => {
-        if (fazenda.Id != null && fazenda?.Id > 0)
-          codigosFazendasManter.push(fazenda.Id);
-      });
-
+ 
       const fazendasRemover = fazendasProdutor.filter(
         (fazenda) => !codigosFazendasManter.includes(fazenda.Id)
       );

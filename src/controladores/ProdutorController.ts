@@ -37,7 +37,25 @@ export class ProdutorController {
       const fazendaCulturaServico = new FazendaCulturaService();
 
       for (let i = 0; i < fazendas.length; i++) {
-        const fazendaCriar: IFazendaAtributosCriacao = fazendas[i];
+        const {
+          nome,
+          estado,
+          cidade,
+          areaTotal,
+          areaAgricultavel,
+          areaVegetacao,
+          culturas,
+        } = fazendas[i];
+        const fazendaCriar = {
+          Nome: nome,
+          Estado: estado,
+          Cidade: cidade,
+          AreaTotal: areaTotal,
+          AreaAgricultavel: areaAgricultavel,
+          AreaVegetacao: areaVegetacao,
+          Culturas: culturas,
+        } as IFazendaAtributosCriacao;
+
         const idFazendaCriada: number = await fazendaServico.CriarFazendas(
           produtorCriado.Id,
           fazendaCriar,
@@ -86,11 +104,32 @@ export class ProdutorController {
 
       const fazendaServico = new FazendaService();
       const fazendaCulturaServico = new FazendaCulturaService();
+      const codigosFazendaManter = fazendas != null ? fazendas.filter((fazenda: any) => fazenda.id != null && fazenda.id > 0 ).map((fazenda: any) => fazenda.id) : [];
+      await fazendaServico.RemoverFazendaNaoInclusas(id, codigosFazendaManter, transacao);
 
-      await fazendaServico.RemoverFazendaNaoInclusas(id, fazendas, transacao);
+      for (let i = 0; i < fazendas?.length; i++) {
+        const {
+          id: idFazenda,
+          nome: nomeFazenda,
+          estado,
+          cidade,
+          areaTotal,
+          areaAgricultavel,
+          areaVegetacao,
+          culturas,
+        } = fazendas[i];
 
-      for (let i = 0; i < fazendas.length; i++) {
-        const fazendaProcessar: IFazendaAtributosCriacao = fazendas[i];
+        const fazendaProcessar ={
+          Id: idFazenda,
+          Nome: nomeFazenda,
+          Estado: estado,
+          Cidade: cidade,
+          AreaTotal: areaTotal,
+          AreaAgricultavel: areaAgricultavel,
+          AreaVegetacao: areaVegetacao,
+          Culturas: culturas,
+        } as IFazendaAtributosCriacao;
+
         const idFazendaAtualizar: number =
           await fazendaServico.AtualizarFazendas(
             Number(id),
@@ -191,11 +230,11 @@ export class ProdutorController {
 
   static async Pesquisar(request: Request, response: Response): Promise<void> {
     try {
-      console.log("incies")
+      console.log("incies");
       const servicoProdutor = new ProdutorService();
-      console.log("instanciado")
+      console.log("instanciado");
       const produtores = await servicoProdutor.ObterProdutores();
-      console.log("consultado")
+      console.log("consultado");
       console.log(produtores);
       response.status(200).json(new RespostaPadrao(produtores));
     } catch (error) {
