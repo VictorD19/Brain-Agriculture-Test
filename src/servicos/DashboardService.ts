@@ -24,8 +24,10 @@ export class DashboardService {
     totalArea: number;
     fazendasPorEstado: IFazendasAgrupadasPorEstado[];
     fazendasPorCultura: IFazendasPorCultura[];
-    totalAreaAgricultavel: number;
-    totalAreaVegetacao: number;
+    usoSolo: {
+      totalAreaAgricultavel: number;
+      totalAreaVegetacao: number;
+    };
   }> {
     const totalFazenda: number = await this._repositorioFazenda.ContarTodos();
     const totalArea: number =
@@ -44,8 +46,10 @@ export class DashboardService {
       totalArea,
       fazendasPorEstado,
       fazendasPorCultura,
-      totalAreaAgricultavel,
-      totalAreaVegetacao,
+      usoSolo: {
+        totalAreaAgricultavel,
+        totalAreaVegetacao,
+      },
     };
   }
   //#endregion

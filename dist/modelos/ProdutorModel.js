@@ -2,11 +2,8 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.ProdutorModel = void 0;
 const sequelize_1 = require("sequelize");
-const sequelize_2 = require("../configuracoes/sequelize");
+const sequelize_2 = require("@configuracoes/sequelize");
 class ProdutorModel extends sequelize_1.Model {
-    ValidarCPF_CNPF() {
-        return true;
-    }
 }
 exports.ProdutorModel = ProdutorModel;
 ProdutorModel.init({

@@ -15,8 +15,8 @@ export class ProdutorService {
   //#endregion
 
   //#region Construtores
-  constructor() {
-    this._repositorioProdutor = new ProdutorRepositorio(ProdutorModel);
+  constructor(repositorioProdutor?: ProdutorRepositorio) {
+    this._repositorioProdutor = repositorioProdutor || new ProdutorRepositorio(ProdutorModel);
   }
   //#endregion
 

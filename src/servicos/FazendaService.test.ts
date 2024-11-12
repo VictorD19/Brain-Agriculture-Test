@@ -2,12 +2,12 @@ import { IFazendaAtributosCriacao, FazendaModel } from "@modelos/FazendaModel";
 import { FazendaRepositorio } from "@repositorios/FazendaRepositorio";
 import { FazendaService } from "@servicos/FazendaService";
 
+jest.mock("@repositorios/FazendaRepositorio");
 jest.mock("@configuracoes/sequelize", () => {
   return {
     serialize: jest.fn(),
   };
 });
-jest.mock("@repositorios/FazendaRepositorio");
 jest.mock("@modelos/FazendaModel", () => {
   return {
     FazendaModel: jest.fn(),
@@ -167,69 +167,117 @@ describe("Testes de Validação de Dados para Criação de Fazenda", () => {
   });
 });
 
-let fazendaService: FazendaService;
-let fazendaRepositorioMock: jest.Mocked<FazendaRepositorio>;
+describe("Validação do serviço de fazenda", () => {
+  let fazendaService: FazendaService;
+  let fazendaRepositorioMock: jest.Mocked<FazendaRepositorio>;
 
-const mockFazenda: IFazendaAtributosCriacao = {
-  ProdutorId: 1,
-  Nome: "Fazenda Teste",
-  Estado: "São Paulo",
-  Cidade: "Campinas",
-  AreaAgricultavel: 500,
-  AreaTotal: 1000,
-  AreaVegetacao: 300,
-};
+  const mockFazenda: IFazendaAtributosCriacao = {
+    ProdutorId: 1,
+    Nome: "Fazenda Teste",
+    Estado: "São Paulo",
+    Cidade: "Campinas",
+    AreaAgricultavel: 500,
+    AreaTotal: 1000,
+    AreaVegetacao: 300,
+  };
 
-beforeEach(() => {
-  const FazendaModelMock = FazendaModel as jest.Mocked<typeof FazendaModel>;
-  fazendaRepositorioMock = new FazendaRepositorio(
-    FazendaModelMock
-  ) as jest.Mocked<FazendaRepositorio>;
-  fazendaService = new FazendaService(fazendaRepositorioMock);
-});
-
-describe("CriarFazendas", () => {
-  it("deve criar uma nova fazenda com sucesso", async () => {
-    const mockFazendaCriada = { ...mockFazenda, Id: 1 } as FazendaModel;
-    fazendaRepositorioMock.Inserir.mockResolvedValue(mockFazendaCriada);
-
-    const resultado = await fazendaService.CriarFazendas(1, mockFazenda);
-
-    expect(resultado).toBe(1);
-    expect(fazendaRepositorioMock.Inserir).toHaveBeenCalledWith(
-      expect.objectContaining(mockFazenda),
-      undefined
-    );
-  });
-});
-
-describe("AtualizarFazendas", () => {
-  it("deve atualizar uma fazenda existente", async () => {
-    const fazendaAtualizada = { ...mockFazenda, Id: 1 } as FazendaModel;
-    fazendaRepositorioMock.Atualizar.mockResolvedValue([
-      1,
-      [fazendaAtualizada],
-    ]);
-
-    const resultado = await fazendaService.AtualizarFazendas(1, {
-      ...mockFazenda,
-      Id: 1,
-    });
-
-    expect(resultado).toBe(1);
-    expect(fazendaRepositorioMock.Atualizar).toHaveBeenCalled();
+  beforeEach(() => {
+    const FazendaModelMock = FazendaModel as jest.Mocked<typeof FazendaModel>;
+    fazendaRepositorioMock = new FazendaRepositorio(
+      FazendaModelMock
+    ) as jest.Mocked<FazendaRepositorio>;
+    fazendaService = new FazendaService(fazendaRepositorioMock);
   });
 
-  it("deve criar nova fazenda quando Id não for fornecido", async () => {
-    const mockFazendaCriada = { ...mockFazenda, Id: 1 } as FazendaModel;
-    fazendaRepositorioMock.Inserir.mockResolvedValue(mockFazendaCriada);
+  describe("CriarFazendas", () => {
+    it("deve criar uma nova fazenda com sucesso", async () => {
+      const mockFazendaCriada = { ...mockFazenda, Id: 1 } as FazendaModel;
+      fazendaRepositorioMock.Inserir.mockResolvedValue(mockFazendaCriada);
 
-    const resultado = await fazendaService.AtualizarFazendas(1, {
-      ...mockFazenda,
-      Id: 0,
+      const resultado = await fazendaService.CriarFazendas(1, mockFazenda);
+
+      expect(resultado).toBe(1);
+      expect(fazendaRepositorioMock.Inserir).toHaveBeenCalledWith(
+        expect.objectContaining(mockFazenda),
+        undefined
+      );
+    });
+    it("ira gera um execeção quando erro", async () => {
+      const FazendaASerCriadamock = {
+        Nome: "",
+        Estado: "",
+        Cidade: "",
+        AreaAgricultavel: 0,
+        AreaTotal: 0,
+        AreaVegetacao: 0,
+      } as FazendaModel;
+      const idProdutor:number = 1;
+      await expect(fazendaService.CriarFazendas(idProdutor,FazendaASerCriadamock)).rejects.toThrow()
+
+    });
+  });
+
+  describe("AtualizarFazendas", () => {
+    it("deve atualizar uma fazenda existente", async () => {
+      const fazendaAtualizada = { ...mockFazenda, Id: 1 } as FazendaModel;
+      fazendaRepositorioMock.Atualizar.mockResolvedValue([
+        1,
+        [fazendaAtualizada],
+      ]);
+
+      const resultado = await fazendaService.AtualizarFazendas(1, {
+        ...mockFazenda,
+        Id: 1,
+      });
+
+      expect(resultado).toBe(1);
+      expect(fazendaRepositorioMock.Atualizar).toHaveBeenCalled();
     });
 
-    expect(resultado).toBe(1);
-    expect(fazendaRepositorioMock.Inserir).toHaveBeenCalled();
+    it("deve criar nova fazenda quando Id não for fornecido", async () => {
+      const mockFazendaCriada = { ...mockFazenda, Id: 1 } as FazendaModel;
+      fazendaRepositorioMock.Inserir.mockResolvedValue(mockFazendaCriada);
+      const idProdutor = 1;
+      const resultado = await fazendaService.AtualizarFazendas(idProdutor, {
+        ...mockFazenda,
+        Id: 0,
+      });
+
+      expect(resultado).toBe(1);
+      expect(fazendaRepositorioMock.Inserir).toHaveBeenCalled();
+    });
+  });
+
+  describe('RemoverFazendaNaoInclusas', () => {
+    it('deve remover fazendas que não estão na lista', async () => {
+      const fazendasExistentes= [{...mockFazenda,Id: 2},{...mockFazenda,Id:1 }] as FazendaModel[];
+
+      fazendaRepositorioMock.BuscarFazendasPorIDProdutor.mockResolvedValue(fazendasExistentes);
+      fazendaRepositorioMock.Deletar.mockResolvedValue(null);
+
+      await fazendaService.RemoverFazendaNaoInclusas(1, [{...mockFazenda,Id: 1}]);
+
+      expect(fazendaRepositorioMock.Deletar).toHaveBeenCalledWith(2, undefined);
+    });
+  });
+
+  describe('ObterCodigosFazendaPorProdutor', () => {
+    it('deve retornar os IDs das fazendas do produtor', async () => {
+      fazendaRepositorioMock.ObterCodigosFazendasPorProdutor.mockResolvedValue([1, 2, 3]);
+
+      const ids = await fazendaService.ObterCodigosFazendaPorProdutor(1);
+
+      expect(ids).toEqual([1, 2, 3]);
+    });
+  });
+
+  describe('RemoverFazendasPorIdProdutor', () => {
+    it('deve remover todas as fazendas de um produtor', async () => {
+      fazendaRepositorioMock.RemoverFazendaPorIdProdutor.mockResolvedValue();
+
+      await fazendaService.RemoverFazendasPorIdProdutor(1);
+
+      expect(fazendaRepositorioMock.RemoverFazendaPorIdProdutor).toHaveBeenCalledWith(1, undefined);
+    });
   });
 });

@@ -20,6 +20,6 @@ const sequelize = new sequelize_1.Sequelize("brain-agriculture", "postgres", "po
 });
 exports.sequelize = sequelize;
 (() => __awaiter(void 0, void 0, void 0, function* () {
-    yield sequelize.sync({ force: true });
+    yield sequelize.sync();
     console.log("Banco inicializado com sucesso");
 }))();

@@ -12,12 +12,16 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.RepositorioBase = void 0;
 const sequelize_1 = require("sequelize");
 class RepositorioBase {
+    //#endregion
+    //#region Construtores
     constructor(modelo) {
         this._modelo = modelo;
     }
-    Inserir(item) {
+    //#endregion
+    //#region  Metodos Publicos
+    Inserir(item, transaction) {
         return __awaiter(this, void 0, void 0, function* () {
-            let itemCriacao = yield this._modelo.create(item);
+            let itemCriacao = yield this._modelo.create(item, { transaction });
             yield itemCriacao.save();
             return itemCriacao;
         });
@@ -42,18 +46,22 @@ class RepositorioBase {
             return yield this._modelo.findAll();
         });
     }
-    Deletar(Id) {
+    Deletar(Id, transaction) {
         return __awaiter(this, void 0, void 0, function* () {
             const where = { Id };
-            return yield this._modelo.destroy({ where });
+            return yield this._modelo.destroy({ where, transaction: transaction });
         });
     }
-    Atualizar(id, item) {
+    Atualizar(id, item, transacao) {
         return __awaiter(this, void 0, void 0, function* () {
             const where = {
                 Id: id,
             };
-            return yield this._modelo.update(item, { where, returning: true });
+            return yield this._modelo.update(item, {
+                where,
+                returning: true,
+                transaction: transacao,
+            });
         });
     }
     ContarTodos() {

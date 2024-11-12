@@ -10,13 +10,32 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.FazendaCulturaRepositorio = void 0;
-const RepositorioBase_1 = require("./base/RepositorioBase");
+const RepositorioBase_1 = require("@repositorios/base/RepositorioBase");
 class FazendaCulturaRepositorio extends RepositorioBase_1.RepositorioBase {
     //#region Metodos Publicos
-    VincularCulturaComFazenda(idCultura, idFazenda) {
+    VincularCulturaComFazenda(idCultura, idFazenda, transaction) {
         return __awaiter(this, void 0, void 0, function* () {
-            const vinculacao = yield this._modelo.create({ CulturaId: idCultura, FazendaId: idFazenda });
+            const vinculacao = yield this._modelo.create({ CulturaId: idCultura, FazendaId: idFazenda }, transaction ? { transaction } : undefined);
             yield vinculacao.save();
+        });
+    }
+    RemoverFazendaCulturaPorFazendaId(idFazenda, transaction) {
+        return __awaiter(this, void 0, void 0, function* () {
+            yield this._modelo.destroy({
+                where: { FazendaId: idFazenda },
+                transaction: transaction,
+            });
+        });
+    }
+    ExisteVinculacao(idFazenda, idCultura) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const existeVinculo = yield this._modelo.findOne({
+                where: {
+                    FazendaId: idFazenda,
+                    CulturaId: idCultura,
+                },
+            });
+            return existeVinculo != null;
         });
     }
 }

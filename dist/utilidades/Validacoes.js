@@ -95,8 +95,10 @@ class Validacoes {
         }
         return false;
     }
-    static ValidarCPFCNPJValido() {
-        return true;
+    static ValidarCPFCNPJValido(cpfCnpj) {
+        const cpfValido = this.ValidarCPF(cpfCnpj);
+        const cnpjValido = this.ValidarCNPJ(cpfCnpj);
+        return cpfValido || cnpjValido;
     }
     //#endregion
     //#region Metodos Privados

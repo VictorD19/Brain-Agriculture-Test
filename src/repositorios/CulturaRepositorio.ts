@@ -24,23 +24,29 @@ export class CulturaRepositorio extends RepositorioBase<CulturaModel> {
     const fazendasPorCultura = (await FazendaCulturaModel.findAll({
       attributes: [
         "CulturaId",
-        [
-          sequelize.fn("COUNT", sequelize.col("FazendaId")),
-          "quantidade",
-        ],
+        [sequelize.fn("COUNT", sequelize.col("FazendaId")), "quantidade"],
       ],
-      group: ["CulturaId"],
+      include: [
+        {
+          model: CulturaModel,
+          as: "Cultura",
+          attributes: ["Nome"], 
+        },
+      ],
+      group: ["CulturaId","Cultura.Nome","Cultura.Id"],
     })) as FazendaCulturaModel[];
 
     return await fazendasPorCultura.map((cultura) => {
       return {
-        nome: `${cultura.FazendaId}`,
+        nome: `${cultura.Cultura?.Nome}`,
         quantidade: parseInt(cultura.get("quantidade") as string, 10),
       } as IFazendasPorCultura;
     });
   }
 
-  async ObterTotalDeFazendasPorCulturasEProdutor(idProdutor: number): Promise<IFazendasPorCultura[]> {
+  async ObterTotalDeFazendasPorCulturasEProdutor(
+    idProdutor: number
+  ): Promise<IFazendasPorCultura[]> {
     const fazendasPorCultura = (await CulturaModel.findAll({
       attributes: [
         "nome",
@@ -49,9 +55,7 @@ export class CulturaRepositorio extends RepositorioBase<CulturaModel> {
           "quantidade",
         ],
       ],
-      where:{
-        
-      },
+      where: {},
       include: [
         {
           model: FazendaCulturaModel,

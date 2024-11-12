@@ -10,8 +10,11 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.ProdutorRepositorio = void 0;
-const RepositorioBase_1 = require("./base/RepositorioBase");
+const CulturaModel_1 = require("@modelos/CulturaModel");
+const FazendaModel_1 = require("@modelos/FazendaModel");
+const RepositorioBase_1 = require("@repositorios/base/RepositorioBase");
 class ProdutorRepositorio extends RepositorioBase_1.RepositorioBase {
+    //#region  Metodos Publicos
     BuscarPorCPF_CNPJ(cpf_cnpj) {
         return __awaiter(this, void 0, void 0, function* () {
             return yield this._modelo.findOne({
@@ -25,6 +28,27 @@ class ProdutorRepositorio extends RepositorioBase_1.RepositorioBase {
         return __awaiter(this, void 0, void 0, function* () {
             const modelo = yield this._modelo.findByPk(id);
             return modelo != null;
+        });
+    }
+    ObterDetalhesProdutorPorId(idProdutor) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const produtor = yield this._modelo.findOne({
+                where: { Id: idProdutor },
+                include: [
+                    {
+                        model: FazendaModel_1.FazendaModel,
+                        include: [
+                            {
+                                model: CulturaModel_1.CulturaModel,
+                                attributes: ["Id", "Nome"],
+                                through: { attributes: [] },
+                            },
+                        ],
+                        attributes: ["Id", "Nome"],
+                    },
+                ],
+            });
+            return produtor;
         });
     }
 }

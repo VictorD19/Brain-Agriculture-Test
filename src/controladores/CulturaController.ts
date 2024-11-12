@@ -3,15 +3,20 @@ import { CulturaService } from "@servicos/CulturaService";
 import { ServicoException } from "@utilidades/Error";
 import { RespostaPadrao } from "@utilidades/RespostaPadrao";
 import { Request, Response } from "express";
-
+/**
+ * @swagger
+ * tags:
+ *   name: Cultura
+ *   description: Endpoints relacionados as culturas
+ */
 export  class CulturaController {
   //#region Metodos Publicos
   static async Inserir(request: Request, response: Response): Promise<void> {
     const transacao = await sequelize.transaction();
     try {
-      const { Nome } = request.body;
+      const { nome } = request.body;
       const servicoCultura = new CulturaService();
-      await servicoCultura.Criar({ Nome: Nome }, transacao);
+      await servicoCultura.Criar({ Nome: nome }, transacao);
       await transacao.commit();
       response
         .status(201)
@@ -33,11 +38,14 @@ export  class CulturaController {
   static async Atualizar(request: Request, response: Response): Promise<void> {
     const transacao = await sequelize.transaction();
     try {
-      const { Nome, Id } = request.body;
+      const { nome, id } = request.body;
       const servicoCultura = new CulturaService();
-      await servicoCultura.Atualizar({ Nome: Nome, Id: Id }, transacao);
+      if (!await servicoCultura.ExisteCulturaPorId(id))
+          throw new ServicoException("Cultura não encontrada");
+        
+      await servicoCultura.Atualizar({ Nome: nome, Id: id }, transacao);
       await transacao.commit();
-      response.status(200).json({ message: "Registro atualizado com sucesso" });
+      response.status(200).json({ message: "Cultura atualizada com sucesso" });
     } catch (error) {
       await transacao.rollback();
       if (error instanceof ServicoException) {

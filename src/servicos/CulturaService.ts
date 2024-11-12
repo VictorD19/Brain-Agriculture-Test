@@ -40,7 +40,7 @@ export class CulturaService {
 
     if (!cultura.Id || cultura.Id == 0)
       throw new ServicoException(
-        "Precisa informar o registro que deseja atualizar"
+        "Precisa informar o registro que deseja atualizar",404
       );
 
     await this._repositorioCultura.Atualizar(cultura.Id, cultura, transacao);

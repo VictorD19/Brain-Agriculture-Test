@@ -11,14 +11,16 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.ProdutorService = void 0;
 const ProdutorRepositorio_1 = require("@repositorios/ProdutorRepositorio");
-const ProdutorModel_1 = require("modelos/ProdutorModel");
+const ProdutorModel_1 = require("@modelos/ProdutorModel");
 const Validacoes_1 = require("@utilidades/Validacoes");
 const Error_1 = require("@utilidades/Error");
+const FazendaCulturaService_1 = require("@servicos/FazendaCulturaService");
+const FazendaService_1 = require("@servicos/FazendaService");
 class ProdutorService {
     //#endregion
     //#region Construtores
-    constructor() {
-        this._repositorioProdutor = new ProdutorRepositorio_1.ProdutorRepositorio(ProdutorModel_1.ProdutorModel);
+    constructor(repositorioProdutor) {
+        this._repositorioProdutor = repositorioProdutor || new ProdutorRepositorio_1.ProdutorRepositorio(ProdutorModel_1.ProdutorModel);
     }
     //#endregion
     //#region Metodos Publicos
@@ -30,31 +32,57 @@ class ProdutorService {
     ObterInformacoesPorId(id) {
         return __awaiter(this, void 0, void 0, function* () {
             const produtor = yield this._repositorioProdutor.BuscarPorCodigo(id);
-            if (!produtor)
-                throw new Error_1.ServicoException("Produtor não encontrado", 404);
-            //pesquisaFazedas e cultura
-            return produtor;
+            if (!produtor) {
+                throw new Error_1.ServicoException("Usuário não encontrado", 404);
+            }
+            const servicoFazendas = new FazendaService_1.FazendaService();
+            const fazendasDoProdutor = yield servicoFazendas.ObterFazendasDoProdutor(id);
+            return {
+                id: produtor.Id,
+                nome: produtor.Nome,
+                cpf_cnpj: produtor.CpfCnpj,
+                fazendas: fazendasDoProdutor.map((fazenda) => {
+                    var _a;
+                    return ({
+                        id: fazenda.Id,
+                        nome: fazenda.Nome,
+                        areaTotal: fazenda.AreaTotal,
+                        areaAgricultavel: fazenda.AreaAgricultavel,
+                        areaVegetacao: fazenda.AreaVegetacao,
+                        estado: fazenda.Estado,
+                        cidade: fazenda.Cidade,
+                        culturas: (_a = fazenda === null || fazenda === void 0 ? void 0 : fazenda.CulturasVinculadas) === null || _a === void 0 ? void 0 : _a.map((cultura) => ({
+                            id: cultura.Id,
+                            nome: cultura.Nome,
+                        })),
+                    });
+                }),
+            };
         });
     }
-    Criar(produtor) {
+    Criar(produtor, transaction) {
         return __awaiter(this, void 0, void 0, function* () {
-            if (!Validacoes_1.Validacoes.ValidarCPFCNPJValido())
+            if (!Validacoes_1.Validacoes.ValidarCPFCNPJValido(produtor.CpfCnpj))
                 throw new Error_1.ServicoException(`CPF ou CNPJ invalido`);
-            yield this._repositorioProdutor.Inserir(produtor);
+            return yield this._repositorioProdutor.Inserir(produtor, transaction);
         });
     }
-    Remover(id) {
+    Remover(id, transacao) {
         return __awaiter(this, void 0, void 0, function* () {
             if (!(yield this._repositorioProdutor.VerificarUsuarioExistentePorId(id)))
                 throw new Error_1.ServicoException("Produtor não encontrado", 404);
+            const servicoFazendaCultura = new FazendaCulturaService_1.FazendaCulturaService();
+            yield servicoFazendaCultura.RemoverPorProdutor(id, transacao);
+            const servicoFazenda = new FazendaService_1.FazendaService();
+            yield servicoFazenda.RemoverFazendasPorIdProdutor(id, transacao);
             this._repositorioProdutor.Deletar(id);
         });
     }
-    Atualizar(id, produtor) {
+    Atualizar(id, produtor, transacao) {
         return __awaiter(this, void 0, void 0, function* () {
             if (!(yield this._repositorioProdutor.VerificarUsuarioExistentePorId(id)))
                 throw new Error_1.ServicoException("Produtor não encontrado", 404);
-            this._repositorioProdutor.Atualizar(id, produtor);
+            this._repositorioProdutor.Atualizar(id, produtor, transacao);
         });
     }
 }

@@ -10,66 +10,72 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.FazendaService = void 0;
-const FazendaCulturaRepositorio_1 = require("@repositorios/FazendaCulturaRepositorio");
 const FazendaRepositorio_1 = require("@repositorios/FazendaRepositorio");
 const Error_1 = require("@utilidades/Error");
-const FazendaCulturaModel_1 = require("modelos/FazendaCulturaModel");
-const FazendaModel_1 = require("modelos/FazendaModel");
+const FazendaModel_1 = require("@modelos/FazendaModel");
 class FazendaService {
     //#endregion
     //#region Constructores
-    constructor() {
-        this._repositorioFazenda = new FazendaRepositorio_1.FazendaRepositorio(FazendaModel_1.FazendaModel);
+    constructor(repositorioFazenda) {
+        this._repositorioFazenda = repositorioFazenda || new FazendaRepositorio_1.FazendaRepositorio(FazendaModel_1.FazendaModel);
     }
     //#endregion
     //#region Metodos Publicos
-    CriarFazendas(fazendas) {
+    CriarFazendas(idProdutor, fazendaCriar, transaction) {
         return __awaiter(this, void 0, void 0, function* () {
-            var _a, _b;
-            for (let i = 0; i < fazendas.length; i++) {
-                const fazendaCriar = fazendas[i];
-                this.ValidarDadosFazenda(fazendaCriar);
-                const fazendaCriada = yield this._repositorioFazenda.Inserir(fazendaCriar);
-                if (fazendaCriar.Culturas != null && fazendaCriar.Culturas.length > 0) {
-                    const repositorioFazendaCultura = new FazendaCulturaRepositorio_1.FazendaCulturaRepositorio(FazendaCulturaModel_1.FazendaCulturaModel);
-                    for (let i = 0; i < ((_b = (_a = fazendaCriar === null || fazendaCriar === void 0 ? void 0 : fazendaCriar.Culturas) === null || _a === void 0 ? void 0 : _a.length) !== null && _b !== void 0 ? _b : 0); i++) {
-                        yield repositorioFazendaCultura.VincularCulturaComFazenda(fazendaCriar.Culturas[i], fazendaCriada.Id);
-                    }
-                }
-            }
+            this.ValidarDadosFazenda(fazendaCriar);
+            const fazendaCriada = yield this._repositorioFazenda.Inserir(Object.assign(Object.assign({}, fazendaCriar), { ProdutorId: idProdutor }), transaction);
+            return fazendaCriada.Id;
         });
     }
-    AtualizarFazendas(idProdutor, fazendas) {
+    RemoverFazendaNaoInclusas(idProdutor, fazendas, transaction) {
         return __awaiter(this, void 0, void 0, function* () {
-            var _a, _b, _c;
             const fazendasProdutor = yield this._repositorioFazenda.BuscarFazendasPorIDProdutor(idProdutor);
             if (fazendasProdutor != null && fazendasProdutor.length > 0) {
                 const codigosFazendasManter = [];
-                fazendas.forEach(fazenda => {
+                fazendas.forEach((fazenda) => {
                     if (fazenda.Id != null && (fazenda === null || fazenda === void 0 ? void 0 : fazenda.Id) > 0)
                         codigosFazendasManter.push(fazenda.Id);
                 });
-                const fazendasRemover = fazendasProdutor.filter(fazenda => !codigosFazendasManter.includes(fazenda.Id));
+                const fazendasRemover = fazendasProdutor.filter((fazenda) => !codigosFazendasManter.includes(fazenda.Id));
                 for (let i = 0; i < fazendasRemover.length; i++) {
                     const fazendaRemover = fazendasRemover[i];
-                    yield this._repositorioFazenda.Deletar(fazendaRemover.Id);
-                }
-            }
-            for (let i = 0; i < fazendas.length; i++) {
-                const fazendaAtualizar = fazendas[i];
-                this.ValidarDadosFazenda(fazendaAtualizar);
-                const [_, fazendaAtualizada] = yield this._repositorioFazenda.Atualizar((_a = fazendaAtualizar === null || fazendaAtualizar === void 0 ? void 0 : fazendaAtualizar.Id) !== null && _a !== void 0 ? _a : 0, fazendaAtualizar);
-                if (fazendaAtualizar.Culturas != null && fazendaAtualizar.Culturas.length > 0) {
-                    const repositorioFazendaCultura = new FazendaCulturaRepositorio_1.FazendaCulturaRepositorio(FazendaCulturaModel_1.FazendaCulturaModel);
-                    for (let i = 0; i < ((_c = (_b = fazendaAtualizar === null || fazendaAtualizar === void 0 ? void 0 : fazendaAtualizar.Culturas) === null || _b === void 0 ? void 0 : _b.length) !== null && _c !== void 0 ? _c : 0); i++) {
-                        yield repositorioFazendaCultura.VincularCulturaComFazenda(fazendaAtualizar.Culturas[i], fazendaAtualizada[0].Id);
-                    }
+                    yield this._repositorioFazenda.Deletar(fazendaRemover.Id, transaction);
                 }
             }
         });
     }
+    AtualizarFazendas(idProdutor, fazendaAtualizar, transaction) {
+        return __awaiter(this, void 0, void 0, function* () {
+            var _a;
+            this.ValidarDadosFazenda(fazendaAtualizar);
+            let fazenda;
+            if (!fazendaAtualizar.Id || fazendaAtualizar.Id == 0)
+                fazenda = yield this._repositorioFazenda.Inserir(Object.assign(Object.assign({}, fazendaAtualizar), { ProdutorId: idProdutor }), transaction);
+            else {
+                const [_, fazendaAtualizada] = yield this._repositorioFazenda.Atualizar((_a = fazendaAtualizar === null || fazendaAtualizar === void 0 ? void 0 : fazendaAtualizar.Id) !== null && _a !== void 0 ? _a : 0, Object.assign(Object.assign({}, fazendaAtualizar), { ProdutorId: idProdutor }), transaction);
+                fazenda = fazendaAtualizada[0];
+            }
+            return fazenda.Id;
+        });
+    }
+    ObterCodigosFazendaPorProdutor(idProdutor) {
+        return __awaiter(this, void 0, void 0, function* () {
+            return yield this._repositorioFazenda.ObterCodigosFazendasPorProdutor(idProdutor);
+        });
+    }
+    RemoverFazendasPorIdProdutor(idProduto, transaction) {
+        return __awaiter(this, void 0, void 0, function* () {
+            yield this._repositorioFazenda.RemoverFazendaPorIdProdutor(idProduto, transaction);
+        });
+    }
+    ObterFazendasDoProdutor(idProdutor) {
+        return __awaiter(this, void 0, void 0, function* () {
+            return yield this._repositorioFazenda.BuscarFazendasPorIDProdutor(idProdutor);
+        });
+    }
     //#endregion
-    //#region  Metodos Privados
+    //#region  Metodos Auxiliares
     ValidarDadosFazenda(fazendaCriar) {
         if (!fazendaCriar.Nome)
             throw new Error_1.ServicoException("Precisa informar um nome para sua fazenda");
@@ -85,7 +91,7 @@ class FazendaService {
             throw new Error_1.ServicoException("Precisa informar a área de vegetação");
         if (fazendaCriar.AreaVegetacao + fazendaCriar.AreaAgricultavel >
             fazendaCriar.AreaTotal)
-            throw new Error_1.ServicoException("A soma da área de vegetação e a área agricultavel não pode ser maior que a área total");
+            throw new Error_1.ServicoException(`A soma da área de vegetação e a área agricultável da fazenda '${fazendaCriar.Nome}' não pode ser maior que a área total`);
     }
 }
 exports.FazendaService = FazendaService;

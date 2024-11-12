@@ -43,7 +43,7 @@ export class FazendaRepositorio extends RepositorioBase<FazendaModel> {
   }
 
   async ObterAreaTotalDeTodasAsFazenda(): Promise<number> {
-    return await this._modelo.sum("AreaTotal");
+    return await this._modelo.sum("AreaTotal") || 0;
   }
 
   async ObterAreaTotalDeTodasAsFazendaPorProdutor(
@@ -100,14 +100,14 @@ export class FazendaRepositorio extends RepositorioBase<FazendaModel> {
   }
 
   async ObterTotalAgricultavelDeTodasAsFazendas():Promise<number>{
-    return await this._modelo.sum("AreaAgricultavel");
+    return await this._modelo.sum("AreaAgricultavel") || 0;
   }
   async ObterTotalAgricultavelDeTodasAsFazendasDoProdutor(idProductor:number):Promise<number>{
-    return await this._modelo.sum("AreaAgricultavel",{ where: {ProdutorId: idProductor}});
+    return await this._modelo.sum("AreaAgricultavel",{ where: {ProdutorId: idProductor}}) || 0;
   }
 
   async ObterTotalVegetacaoDeTodasAsFazendas():Promise<number>{
-    return await this._modelo.sum("AreaVegetacao");
+    return await this._modelo.sum("AreaVegetacao") || 0;
   }
   async ObterTotalVegetacaoDeTodasAsFazendasDoProdutor(idProductor:number):Promise<number>{
     return await this._modelo.sum("AreaVegetacao",{ where: {ProdutorId: idProductor}});

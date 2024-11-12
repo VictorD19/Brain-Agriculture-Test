@@ -7,6 +7,13 @@ import { RespostaPadrao } from "@utilidades/RespostaPadrao";
 import { FazendaCulturaService } from "@servicos/FazendaCulturaService";
 import { IFazendaAtributosCriacao } from "@modelos/FazendaModel";
 
+/**
+ * @swagger
+ * tags:
+ *   name: Produtor
+ *   description: Endpoints relacionados ao produtores
+ */
+
 export  class ProdutorController {
   static async Inserir(request: Request, response: Response): Promise<void> {
     const transacao = await sequelize.transaction();

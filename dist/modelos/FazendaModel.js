@@ -2,8 +2,7 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.FazendaModel = void 0;
 const sequelize_1 = require("sequelize");
-const sequelize_2 = require("../configuracoes/sequelize");
-const ProdutorModel_1 = require("./ProdutorModel");
+const sequelize_2 = require("@configuracoes/sequelize");
 class FazendaModel extends sequelize_1.Model {
 }
 exports.FazendaModel = FazendaModel;
@@ -46,12 +45,4 @@ FazendaModel.init({
     sequelize: sequelize_2.sequelize,
     tableName: "T_FAZENDA",
     modelName: "Fazenda",
-});
-FazendaModel.belongsTo(ProdutorModel_1.ProdutorModel, {
-    foreignKey: "ProdutorId",
-    as: "Produtor",
-});
-ProdutorModel_1.ProdutorModel.hasMany(FazendaModel, {
-    foreignKey: "ProdutorId",
-    as: "Fazenda",
 });

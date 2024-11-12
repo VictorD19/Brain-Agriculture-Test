@@ -104,7 +104,7 @@ return fazenda.Id;
 
   //#endregion
 
-  //#region  Metodos Privados
+  //#region  Metodos Auxiliares
    ValidarDadosFazenda(fazendaCriar: IFazendaAtributosCriacao): void {
     if (!fazendaCriar.Nome)
       throw new ServicoException("Precisa informar um nome para sua fazenda");
