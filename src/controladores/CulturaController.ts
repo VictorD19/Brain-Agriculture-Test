@@ -1,4 +1,5 @@
 import { sequelize } from "@configuracoes/sequelize";
+import { ICulturaCriacaoAtributos } from "@modelos/CulturaModel";
 import { CulturaService } from "@servicos/CulturaService";
 import { ServicoException } from "@utilidades/Error";
 import { RespostaPadrao } from "@utilidades/RespostaPadrao";
@@ -9,7 +10,7 @@ import { Request, Response } from "express";
  *   name: Cultura
  *   description: Endpoints relacionados as culturas
  */
-export  class CulturaController {
+export class CulturaController {
   //#region Metodos Publicos
   static async Inserir(request: Request, response: Response): Promise<void> {
     const transacao = await sequelize.transaction();
@@ -40,9 +41,9 @@ export  class CulturaController {
     try {
       const { nome, id } = request.body;
       const servicoCultura = new CulturaService();
-      if (!await servicoCultura.ExisteCulturaPorId(id))
-          throw new ServicoException("Cultura não encontrada");
-        
+      if (!(await servicoCultura.ExisteCulturaPorId(id)))
+        throw new ServicoException("Cultura não encontrada");
+
       await servicoCultura.Atualizar({ Nome: nome, Id: id }, transacao);
       await transacao.commit();
       response.status(200).json({ message: "Cultura atualizada com sucesso" });
@@ -112,6 +113,28 @@ export  class CulturaController {
         .status(400)
         .json(
           new RespostaPadrao(false, "Ocorreu um erro ao tentar buscar cultura")
+        );
+    }
+  }
+
+  static async Pesquisar(request: Request, response: Response): Promise<void> {
+    try {
+      const servicoCultura = new CulturaService();
+      const culturas: ICulturaCriacaoAtributos[] =
+        await servicoCultura.ObterCulturas();
+      response.status(200).json(
+        new RespostaPadrao(
+          culturas.map((cultura) => ({
+            id: cultura.Id,
+            nome: cultura.Nome,
+          }))
+        )
+      );
+    } catch (error) {
+      response
+        .status(400)
+        .json(
+          new RespostaPadrao(false, "Ocorreu um erro ao tentar buscar culturas")
         );
     }
   }

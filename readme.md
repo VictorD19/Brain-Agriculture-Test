@@ -167,6 +167,10 @@ Retorna os dados segmentados para o dashboard:
 
 ### Cultura
 
+#### GET /cultura/pesquisar
+
+Retorna todas as culturas cadastradas.
+
 #### GET /cultura/:id
 
 Retorna dados de uma cultura específica.

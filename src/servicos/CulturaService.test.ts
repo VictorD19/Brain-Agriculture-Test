@@ -1,17 +1,17 @@
 jest.mock("@repositorios/CulturaRepositorio", () => {
-    return {
-      CulturaRepositorio: jest.fn().mockImplementation(() => ({
-        VerificarSeExistePorNome: jest.fn(),
-        Inserir: jest.fn(),
-        Atualizar: jest.fn(),
-        Deletar: jest.fn(),
-        BuscarPorCodigo: jest.fn(),
-        VerificarSeExistePorId: jest.fn(),
-      })),
-    };
-  });
+  return {
+    CulturaRepositorio: jest.fn().mockImplementation(() => ({
+      VerificarSeExistePorNome: jest.fn(),
+      Inserir: jest.fn(),
+      Atualizar: jest.fn(),
+      Deletar: jest.fn(),
+      BuscarPorCodigo: jest.fn(),
+      BuscarTodos: jest.fn(),
+      VerificarSeExistePorId: jest.fn(),
+    })),
+  };
+});
 
-  
 import { CulturaService } from "@servicos/CulturaService";
 import { CulturaRepositorio } from "@repositorios/CulturaRepositorio";
 import { CulturaModel } from "@modelos/CulturaModel";
@@ -22,7 +22,9 @@ describe("CulturaService", () => {
 
   beforeEach(() => {
     const CulturaModeloMock = CulturaModel as jest.Mocked<typeof CulturaModel>;
-    culturaRepositorioMock = new CulturaRepositorio(CulturaModeloMock) as jest.Mocked<CulturaRepositorio>;
+    culturaRepositorioMock = new CulturaRepositorio(
+      CulturaModeloMock
+    ) as jest.Mocked<CulturaRepositorio>;
     culturaService = new CulturaService(culturaRepositorioMock);
   });
 
@@ -39,16 +41,16 @@ describe("CulturaService", () => {
     });
 
     it("Deve lançar erro se o nome da cultura não for fornecido", async () => {
-      await expect(
-        culturaService.Criar({ Nome: "" })
-      ).rejects.toThrow("Precisa informar um nome valido para sua cultura");
+      await expect(culturaService.Criar({ Nome: "" })).rejects.toThrow(
+        "Precisa informar um nome valido para sua cultura"
+      );
     });
 
     it("Deve lançar erro se a cultura já existir", async () => {
       culturaRepositorioMock.VerificarSeExistePorNome.mockResolvedValue(true);
-      await expect(
-        culturaService.Criar({ Nome: "Soja" })
-      ).rejects.toThrow("Cultura já existe");
+      await expect(culturaService.Criar({ Nome: "Soja" })).rejects.toThrow(
+        "Cultura já existe"
+      );
     });
   });
 
@@ -71,9 +73,9 @@ describe("CulturaService", () => {
     });
 
     it("Deve lançar erro se o Id não for fornecido", async () => {
-      await expect(
-        culturaService.Atualizar({ Nome: "Milho" })
-      ).rejects.toThrow("Precisa informar o registro que deseja atualizar");
+      await expect(culturaService.Atualizar({ Nome: "Milho" })).rejects.toThrow(
+        "Precisa informar o registro que deseja atualizar"
+      );
     });
   });
 
@@ -115,13 +117,27 @@ describe("CulturaService", () => {
       culturaRepositorioMock.VerificarSeExistePorId.mockResolvedValue(true);
       const existe = await culturaService.ExisteCulturaPorId(1);
       expect(existe).toBe(true);
-      expect(culturaRepositorioMock.VerificarSeExistePorId).toHaveBeenCalledWith(1);
+      expect(
+        culturaRepositorioMock.VerificarSeExistePorId
+      ).toHaveBeenCalledWith(1);
     });
 
     it("Deve retornar false se a cultura não existir", async () => {
       culturaRepositorioMock.VerificarSeExistePorId.mockResolvedValue(false);
       const existe = await culturaService.ExisteCulturaPorId(1);
       expect(existe).toBe(false);
+    });
+  });
+
+  describe("ObterCulturas", () => {
+    it("Deve retornar todas as culturas", async () => {
+      const culturaMock = [
+        { Id: 1, Nome: "Soja" },
+        { Id: 2, Nome: "Milho" },
+      ] as CulturaModel[];
+      culturaRepositorioMock.BuscarTodos.mockResolvedValue(culturaMock);
+      const culturas = await culturaService.ObterCulturas();
+      expect(culturas).toEqual(culturaMock);
     });
   });
 });
