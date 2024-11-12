@@ -73,5 +73,8 @@ export class CulturaService {
     return await this._repositorioCultura.VerificarSeExistePorId(idCultura);
   }
   
+  async ObterCulturas(): Promise<ICulturaCriacaoAtributos[]> {
+    return await this._repositorioCultura.BuscarTodos();
+  }
   //#endregion
 }

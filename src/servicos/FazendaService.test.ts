@@ -234,9 +234,7 @@ describe("Validação do serviço de fazenda", () => {
       );
       fazendaRepositorioMock.Deletar.mockResolvedValue(null);
 
-      await fazendaService.RemoverFazendaNaoInclusas(1, [
-        { ...mockFazenda, Id: 1 },
-      ]);
+      await fazendaService.RemoverFazendaNaoInclusas(1,[1]);
 
       expect(fazendaRepositorioMock.Deletar).toHaveBeenCalledWith(2, undefined);
     });

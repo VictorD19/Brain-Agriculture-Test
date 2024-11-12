@@ -230,15 +230,11 @@ export class ProdutorController {
 
   static async Pesquisar(request: Request, response: Response): Promise<void> {
     try {
-      console.log("incies");
       const servicoProdutor = new ProdutorService();
-      console.log("instanciado");
       const produtores = await servicoProdutor.ObterProdutores();
-      console.log("consultado");
-      console.log(produtores);
+
       response.status(200).json(new RespostaPadrao(produtores));
     } catch (error) {
-      console.log(error);
       response
         .status(400)
         .json(

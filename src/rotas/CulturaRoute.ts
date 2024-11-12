@@ -4,6 +4,47 @@ import { CulturaController } from "controladores/CulturaController";
 const router: Router = Router();
 /**
  * @swagger
+ * /cultura/pesquisar:
+ *   get:
+ *     summary: Obtem todas as culturas cadastradas
+ *     tags:
+ *       - Cultura
+ *     responses:
+ *       200:
+ *         description: Dados da cultura.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 Sucesso:
+ *                   type: boolean
+ *                 Mensagem:
+ *                   type: string
+ *                   example: ""
+ *                 Data:
+ *                   type: array
+ *       400:
+ *         description: Ocorreu um erro ao tentar buscar culturas
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 Sucesso:
+ *                   type: boolean
+ *                   example: false
+ *                 Mensagem:
+ *                   type: string
+ *                   example: "Ocorreu um erro ao tentar buscar culturas"
+ *                 Data:
+ *                   type: object
+ *                   example: null
+ */
+router.get("/pesquisar", CulturaController.Pesquisar);
+
+/**
+ * @swagger
  * /cultura/{id}:
  *   get:
  *     summary: Obtem informações da cultura

@@ -12,6 +12,7 @@ jest.mock("@repositorios/ProdutorRepositorio", () => {
       Atualizar: jest.fn(),
       Inserir: jest.fn(),
       Deletar: jest.fn(),
+      BuscarTodos: jest.fn(),
       BuscarPorCodigo: jest.fn(),
       BuscarPorCPF_CNPJ: jest.fn(),
     })),
@@ -187,6 +188,28 @@ describe("ProdutorService", () => {
           CpfCnpj: "12345678901",
         })
       ).rejects.toThrow("Produtor não encontrado");
+    });
+  });
+
+  describe("ObterProdutores", () => {
+    it("Deve retornar uma lista de produtores", async () => {
+      const produtoresMock = [
+        {
+          Id: 1,
+          Nome: "Produtor 1",
+          CpfCnpj: "12345678901",
+        },
+        {
+          Id: 2,
+          Nome: "Produtor 2",
+          CpfCnpj: "98765432109",
+        },
+      ] as ProdutorModel[];
+
+      produtorRepositorioMock.BuscarTodos.mockResolvedValue(produtoresMock);
+
+      const resultado = await produtorService.ObterProdutores();
+      expect(resultado).toEqual(produtoresMock);
     });
   });
 });
