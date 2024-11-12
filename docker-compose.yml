@@ -1,10 +1,8 @@
-version: '3.8'
-
 services:
   app:
     build:
       context: .
-      dockerfile: Dockerfile
+      dockerfile: dockerfile
     ports:
       - "3000:3000"
     env_file:
@@ -15,18 +13,26 @@ services:
       - .:/app
       - /app/node_modules
     command: sh -c "npm run build && npm start"
+    networks:
+      - test_network
+
 
   db:
     image: postgres:15
     restart: always
     ports:
-      - "5433:5433"
+      - "5432:5432"
     environment:
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: postgres
       POSTGRES_DB: brain-agriculture
     volumes:
       - db_data:/var/lib/postgresql/data
+    networks:
+      - test_network
 
 volumes:
   db_data:
+
+networks:
+  test_network:
